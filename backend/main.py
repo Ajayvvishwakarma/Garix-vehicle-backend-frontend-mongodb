@@ -32,9 +32,20 @@ wishlist = db["wishlist"]        # Added for Wishlist logic
 
 os.makedirs("static", exist_ok=True)
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 @app.get("/")
-def home():
-    return FileResponse("static/index.html") if os.path.exists("static/index.html") else {"message": "API is running"}
+def serve_home():
+    return FileResponse("static/index.html")
+
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    file_path = os.path.join("static", full_path)
+
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+
+    return FileResponse("static/index.html")
 
 # 1. APPOINTMENT
 @app.post("/api/appointment")
