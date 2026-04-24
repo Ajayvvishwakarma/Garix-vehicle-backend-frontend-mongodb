@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse
 from pymongo import MongoClient
 from dotenv import load_dotenv
+from fastapi.staticfiles import StaticFiles
 from bson import ObjectId
 import os
 from datetime import datetime
@@ -32,20 +33,20 @@ wishlist = db["wishlist"]        # Added for Wishlist logic
 
 os.makedirs("static", exist_ok=True)
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
-@app.get("/")
-def serve_home():
-    return FileResponse("static/index.html")
+# @app.get("/")
+# def serve_home():
+#     return FileResponse("static/index.html")
 
-@app.get("/{full_path:path}")
-async def serve_frontend(full_path: str):
-    file_path = os.path.join("static", full_path)
+# @app.get("/{full_path:path}")
+# async def serve_frontend(full_path: str):
+#     file_path = os.path.join("static", full_path)
 
-    if os.path.exists(file_path):
-        return FileResponse(file_path)
+#     if os.path.exists(file_path):
+#         return FileResponse(file_path)
 
-    return FileResponse("static/index.html")
+#     return FileResponse("static/index.html")
 
 # 1. APPOINTMENT
 @app.post("/api/appointment")
