@@ -1,0 +1,528 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Garix - Appointment Form Fixed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com/">
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@200..800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --theme-color: #ff5e14;
+      --theme-color-hover: #e04e0c;
+      --text-color: #333;
+    }
+
+    body { font-family: 'Roboto', sans-serif; color: var(--text-color); overflow-x: hidden; }
+    h1, h2, h3, h4, h5, h6 { font-family: 'Dosis', sans-serif; font-weight: 700; }
+    .space-top { padding-top: 80px; }
+    .space-bottom { padding-bottom: 80px; }
+    .space-extra-bottom { padding-bottom: 100px; }
+    .mb-30 { margin-bottom: 30px; }
+    .z-index-common { position: relative; z-index: 2; }
+
+    .vs-btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 12px 30px; background-color: var(--theme-color); color: #fff;
+      font-weight: 500; border: none; text-transform: uppercase; font-size: 14px;
+      cursor: pointer; transition: 0.3s; letter-spacing: 1px;
+    }
+    .vs-btn:hover { background-color: var(--theme-color-hover); color: #fff; }
+    .vs-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+
+    /* Header */
+    .header-top { background: #111; color: #fff; padding: 10px 0; font-size: 14px; }
+    .header-info a { color: #fff; }
+    .header-social a { color: #fff; margin-left: 15px; }
+    .header-bottom { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 999; }
+    .main-menu ul { display: flex; margin-bottom: 0; list-style: none; padding-left: 0; }
+    .main-menu ul li { position: relative; margin: 0 15px; }
+    .main-menu ul li a { display: block; padding: 20px 0; font-weight: 500; color: #333; text-decoration: none; }
+    .main-menu ul li a:hover { color: var(--theme-color); }
+
+    /* Breadcrumb */
+    .breadcumb-wrapper {
+      background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                  url('https://picsum.photos/seed/garix-bread/1920/400') no-repeat center/cover;
+      padding: 100px 0; color: #fff; text-align: center;
+    }
+    .breadcumb-title { font-size: 48px; margin-bottom: 10px; color: #fff; }
+    .breadcumb-menu { list-style: none; padding: 0; }
+    .breadcumb-menu li { display: inline-block; margin: 0 10px; color: #fff; }
+    .breadcumb-menu a { color: #fff; text-decoration: none; }
+
+    /* Form Card */
+    .form-wrapper {
+      background: #fff; padding: 50px; border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+      border-top: 5px solid var(--theme-color);
+    }
+    .form-wrapper label { font-weight: 500; color: #444; margin-bottom: 6px; display: block; }
+    .form-wrapper .form-control, .form-wrapper select {
+      padding: 12px 15px; border: 1px solid #e0e0e0; border-radius: 5px;
+      width: 100%; font-size: 14px; transition: border-color 0.3s;
+    }
+    .form-wrapper .form-control:focus, .form-wrapper select:focus {
+      outline: none; box-shadow: none; border-color: var(--theme-color);
+    }
+    .form-group { margin-bottom: 20px; }
+    .error { color: #dc3545; font-size: 12px; display: block; margin-top: 4px; }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 30px; right: 30px; z-index: 99999;
+      padding: 14px 24px; border-radius: 6px; font-size: 15px; font-weight: 500;
+      color: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      transition: opacity 0.4s ease; display: none; max-width: 380px;
+    }
+    #toast.success { background: #28a745; }
+    #toast.error   { background: #dc3545; }
+
+    /* Spinner inside button */
+    .btn-spinner {
+      width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff; border-radius: 50%;
+      animation: spin 0.7s linear infinite; display: inline-block; margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* FAQ */
+    .accordion-button:not(.collapsed) { background-color: var(--theme-color); color: #fff; }
+    .accordion-button:focus { box-shadow: none; }
+
+    /* Footer */
+    footer { background: #222; color: #fff; padding-top: 80px; }
+    .widget_title { font-size: 20px; margin-bottom: 25px; color: #fff; position: relative; padding-bottom: 10px; }
+    .widget_title::after { content: ''; position: absolute; left: 0; bottom: 0; width: 40px; height: 3px; background: var(--theme-color); }
+    .social-style1 a {
+      width: 40px; height: 40px; background: rgba(255,255,255,0.1);
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 50%; color: #fff; margin-right: 10px; transition: 0.3s; text-decoration: none;
+    }
+    .social-style1 a:hover { background: var(--theme-color); }
+    .copyright-wrap { background: #111; padding: 20px 0; text-align: center; margin-top: 50px; }
+    .copyright-text { color: #777; margin: 0; }
+    footer ul { list-style: none; padding: 0; }
+    footer ul li { margin-bottom: 10px; }
+    footer ul li a { color: rgba(255,255,255,0.6); text-decoration: none; }
+    footer ul li a:hover { color: var(--theme-color); }
+  </style>
+</head>
+
+<body>
+
+  <!-- Toast Notification -->
+  <div id="toast"></div>
+
+  <!-- Header -->
+  <header class="vs-header header-layout1">
+    <div class="header-top d-none d-lg-block">
+      <div class="container">
+        <div class="row justify-content-between align-items-center">
+          <div class="col-auto">
+            <span class="me-4"><i class="fas fa-clock me-2"></i>Fri - Sat 6:00 - 18:00</span>
+            <a href="tel:+052699256693" class="me-4"><i class="fas fa-phone-alt me-2"></i>052 (699) 256 - 693</a>
+            <a href="mailto:mail@garix.com"><i class="fas fa-envelope me-2"></i>mail@garix.com</a>
+          </div>
+          <div class="col-auto header-social">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="header-bottom">
+      <div class="container">
+        <div class="row align-items-center py-2">
+          <div class="col-lg-3 col-6">
+            <h2 style="color:var(--theme-color); font-weight:800; margin:0;">GARIX</h2>
+          </div>
+          <div class="col-lg-9 d-none d-lg-flex justify-content-end align-items-center">
+            <nav class="main-menu me-4">
+              <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="#" style="color:var(--theme-color);">Appointment</a></li>
+                <li><a href="#">Services</a></li>
+                <li><a href="#">Shop</a></li>
+                <li><a href="#">Contact</a></li>
+              </ul>
+            </nav>
+            <a href="#appointmentForm" class="vs-btn">Book Now</a>
+          </div>
+          <div class="col-6 d-block d-lg-none text-end">
+            <button style="background:none;border:none;font-size:24px;"><i class="fas fa-bars"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Breadcrumb -->
+  <div class="breadcumb-wrapper">
+    <div class="container z-index-common">
+      <div class="breadcumb-content">
+        <h1 class="breadcumb-title">Appointment</h1>
+        <ul class="breadcumb-menu">
+          <li><a href="#">Home</a></li>
+          <li>Appointment</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APPOINTMENT SECTION -->
+  <div class="space-top space-bottom">
+    <div class="container">
+      <div class="row align-items-center g-5">
+
+        <!-- Left: Info -->
+        <div class="col-lg-6 mb-30">
+          <span style="color:var(--theme-color); font-weight:700; font-size:14px; text-transform:uppercase; letter-spacing:2px;">Make An Appointment</span>
+          <h2 style="font-size:36px; margin:15px 0 20px;">Schedule Your Service Today</h2>
+          <p class="text-muted mb-4">Our experienced technicians are ready to help. Fill the form and we'll confirm your appointment within 24 hours.</p>
+          
+          <div class="d-flex align-items-start mb-3">
+            <div style="width:48px;height:48px;background:var(--theme-color);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="fas fa-phone-alt text-white"></i>
+            </div>
+            <div class="ms-3">
+              <h5 class="mb-0">Call Us</h5>
+              <p class="text-muted mb-0">052 (699) 256 - 693</p>
+            </div>
+          </div>
+          
+          <div class="d-flex align-items-start mb-3">
+            <div style="width:48px;height:48px;background:var(--theme-color);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="fas fa-envelope text-white"></i>
+            </div>
+            <div class="ms-3">
+              <h5 class="mb-0">Email Us</h5>
+              <p class="text-muted mb-0">mail@garix.com</p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start">
+            <div style="width:48px;height:48px;background:var(--theme-color);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <i class="fas fa-map-marker-alt text-white"></i>
+            </div>
+            <div class="ms-3">
+              <h5 class="mb-0">Visit Us</h5>
+              <p class="text-muted mb-0">Fifth Avenue 5501, Broadway, New York</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Form -->
+        <div class="col-lg-6">
+          <div class="form-wrapper">
+            <h3 style="margin-bottom:30px; font-size:26px;">Book Appointment</h3>
+
+            <!-- =============================================
+                 FORM — connected to FastAPI /api/contact
+                 ============================================= -->
+            <form id="appointmentForm" novalidate>
+
+              <!-- Name -->
+              <div class="form-group">
+                <label for="name">Your Name *</label>
+                <input class="form-control" type="text" id="name" name="name" placeholder="Enter Your Full Name">
+                <small class="error" id="nameError"></small>
+              </div>
+
+              <!-- Email -->
+              <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input class="form-control" type="email" id="email" name="email" placeholder="Enter Your Email">
+                <small class="error" id="emailError"></small>
+              </div>
+
+              <!-- Date & Time Row -->
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="date">Preferred Date *</label>
+                    <input class="form-control" type="date" id="date" name="date">
+                    <small class="error" id="dateError"></small>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="time">Preferred Time *</label>
+                    <input class="form-control" type="time" id="time" name="time">
+                    <small class="error" id="timeError"></small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Service/Vehicle Select -->
+              <div class="form-group">
+                <label for="subject">Select Service *</label>
+                <select class="form-control" id="subject" name="subject">
+                  <option value="">— Select a Service —</option>
+                  <option value="Oil Change">Oil Change</option>
+                  <option value="Tire Rotation">Tire Rotation</option>
+                  <option value="Brake Inspection">Brake Inspection</option>
+                  <option value="Engine Tune-Up">Engine Tune-Up</option>
+                  <option value="Transmission Flush">Transmission Flush</option>
+                  <option value="AC Service">AC Service</option>
+                  <option value="Other">Other</option>
+                </select>
+                <small class="error" id="subjectError"></small>
+              </div>
+
+              <!-- Message -->
+              <div class="form-group">
+                <label for="message">Message / Issue Details</label>
+                <textarea class="form-control" id="message" name="message" placeholder="Describe your issue..." rows="4"></textarea>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" class="vs-btn w-100 justify-content-center" id="submitBtn">
+                Send Appointment
+              </button>
+
+            </form>
+            <!-- FORM END -->
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <section class="space-top space-extra-bottom bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 mx-auto text-center mb-4">
+          <span style="color:var(--theme-color); font-weight:700; text-transform:uppercase; letter-spacing:2px;">FAQs</span>
+          <h2>Frequently Asked Questions</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-10 mx-auto">
+          <div class="accordion" id="accordionFaq">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                  How often should I schedule routine maintenance?
+                </button>
+              </h2>
+              <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#accordionFaq">
+                <div class="accordion-body">Most vehicles need a routine check every 5,000–7,500 miles or every 6 months, whichever comes first. Consult your owner's manual for exact intervals.</div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                  How long does a typical car service appointment take?
+                </button>
+              </h2>
+              <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#accordionFaq">
+                <div class="accordion-body">Simple services like oil changes take about 30 minutes. More complex repairs such as brake overhauls or engine diagnostics can take 2–4 hours.</div>
+              </div>
+            </div>
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                  Can you provide a shuttle service or loaner cars?
+                </button>
+              </h2>
+              <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#accordionFaq">
+                <div class="accordion-body">Yes! We offer a complimentary shuttle service within 5 miles of our shop for repairs taking more than 2 hours.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer--layout1">
+    <div class="container">
+      <div class="row align-items-center justify-content-between mb-5">
+        <div class="col-lg-3 mb-30">
+          <h2 style="color:var(--theme-color);">GARIX</h2>
+        </div>
+        <div class="col-lg-6 mb-30">
+          <p class="text-white-50">Lorem ipsum dolor sit amet. Quo velit eum minima id eligendi mollitia cupiditate velit.</p>
+        </div>
+        <div class="col-lg-3 mb-30 text-lg-end">
+          <div class="social-style1">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-pinterest-p"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="row justify-content-between">
+        <div class="col-md-6 col-lg-3 mb-4">
+          <h3 class="widget_title">Useful Links</h3>
+          <ul>
+            <li><a href="#"><i class="far fa-angle-right me-2"></i>Home</a></li>
+            <li><a href="#"><i class="far fa-angle-right me-2"></i>About</a></li>
+            <li><a href="#"><i class="far fa-angle-right me-2"></i>Services</a></li>
+            <li><a href="#"><i class="far fa-angle-right me-2"></i>Contact</a></li>
+          </ul>
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4">
+          <h3 class="widget_title">Opening Hours</h3>
+          <table class="table table-borderless text-white-50">
+            <tr><td>Mon</td><td>09:00 - 18:00</td></tr>
+            <tr><td>Tue</td><td>10:00 - 19:00</td></tr>
+            <tr><td>Wed</td><td>08:00 - 17:00</td></tr>
+            <tr><td>Thu</td><td>09:30 - 18:30</td></tr>
+            <tr><td>Fri - Sat</td><td>06:00 - 18:00</td></tr>
+          </table>
+        </div>
+        <div class="col-md-6 col-lg-4 mb-4">
+          <h3 class="widget_title">Contact Info</h3>
+          <ul>
+            <li class="text-white-50"><i class="fas fa-phone-alt me-2" style="color:var(--theme-color)"></i>052 (699) 256 - 693</li>
+            <li class="text-white-50"><i class="fas fa-envelope me-2" style="color:var(--theme-color)"></i>mail@garix.com</li>
+            <li class="text-white-50"><i class="fas fa-map-marker-alt me-2" style="color:var(--theme-color)"></i>Fifth Avenue 5501, New York</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="copyright-wrap">
+      <p class="copyright-text">Copyright &copy; <script>document.write(new Date().getFullYear())</script> Garix. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- =============================================
+       FASTAPI FORM INTEGRATION SCRIPT
+       API BASE: http://localhost:8000
+       ENDPOINT: POST /api/contact
+       FIELDS: name, email, date, time, subject, message
+       ============================================= -->
+  <script>
+    const API_BASE = ""; // Same origin — FastAPI serve kar raha hai yeh file
+
+    // ── Toast Helper ────────────────────────────────
+    function showToast(message, type = "success") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = type;
+      toast.style.display = "block";
+      toast.style.opacity = "1";
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => { toast.style.display = "none"; }, 400);
+      }, 4000);
+    }
+
+    // ── Clear all errors ─────────────────────────────
+    function clearErrors() {
+      document.querySelectorAll(".error").forEach(el => el.textContent = "");
+      document.querySelectorAll(".form-control, select").forEach(el => el.style.borderColor = "#e0e0e0");
+    }
+
+    function showError(fieldId, msg) {
+      document.getElementById(fieldId + "Error").textContent = msg;
+      const input = document.getElementById(fieldId);
+      if (input) input.style.borderColor = "#dc3545";
+    }
+
+    // ── Validate Form ────────────────────────────────
+    function validateForm(data) {
+      let valid = true;
+      clearErrors();
+
+      if (!data.name) { showError("name", "Name is required"); valid = false; }
+      if (!data.email || !data.email.includes("@") || !data.email.includes(".")) {
+        showError("email", "Valid email is required"); valid = false;
+      }
+      if (!data.date) { showError("date", "Please select a date"); valid = false; }
+      if (!data.time) { showError("time", "Please select a time"); valid = false; }
+      if (!data.subject) { showError("subject", "Please select a service"); valid = false; }
+
+      return valid;
+    }
+
+    // ── Submit Handler ───────────────────────────────
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("appointmentForm");
+      const submitBtn = document.getElementById("submitBtn");
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+
+        const data = {
+          name:    document.getElementById("name").value.trim(),
+          email:   document.getElementById("email").value.trim(),
+          date:    document.getElementById("date").value,
+          time:    document.getElementById("time").value,
+          subject: document.getElementById("subject").value,
+          message: document.getElementById("message").value.trim(),
+        };
+
+        // 1. Validate
+        if (!validateForm(data)) return;
+
+        // 2. Loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span class="btn-spinner"></span> Sending...`;
+
+        // 3. Build FormData (FastAPI Form(...) expects multipart/form-data)
+        const formData = new FormData();
+        Object.entries(data).forEach(([key, val]) => formData.append(key, val));
+
+        try {
+          // 4. POST to FastAPI
+          const res = await fetch(`${API_BASE}/api/contact`, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!res.ok) {
+            const errText = await res.text();
+            console.error("Server error:", errText);
+            throw new Error(`Server returned ${res.status}`);
+          }
+
+          const json = await res.json();
+
+          if (json.status === "success") {
+            showToast("✅ Appointment booked! ID: " + json.id, "success");
+            form.reset();
+            clearErrors();
+          } else {
+            showToast("❌ Something went wrong. Please try again.", "error");
+          }
+
+        } catch (err) {
+          console.error("API Error:", err);
+          showToast("❌ Cannot connect to server. Make sure FastAPI is running on port 8000.", "error");
+        } finally {
+          // 5. Restore button
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = "Send Appointment";
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
