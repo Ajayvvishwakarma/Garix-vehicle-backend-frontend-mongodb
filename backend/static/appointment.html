@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html class="no-js" lang="zxx">
 <head>
   <meta charset="utf-8">
@@ -231,7 +231,7 @@
             <h3 style="margin-bottom:30px; font-size:26px;">Book Appointment</h3>
 
             <!-- =============================================
-                 FORM — connected to FastAPI /api/contact
+                 FORM â€” connected to FastAPI /api/contact
                  ============================================= -->
             <form id="appointmentForm" novalidate>
 
@@ -271,7 +271,7 @@
               <div class="form-group">
                 <label for="subject">Select Service *</label>
                 <select class="form-control" id="subject" name="subject">
-                  <option value="">— Select a Service —</option>
+                  <option value="">â€” Select a Service â€”</option>
                   <option value="Oil Change">Oil Change</option>
                   <option value="Tire Rotation">Tire Rotation</option>
                   <option value="Brake Inspection">Brake Inspection</option>
@@ -322,7 +322,7 @@
                 </button>
               </h2>
               <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#accordionFaq">
-                <div class="accordion-body">Most vehicles need a routine check every 5,000–7,500 miles or every 6 months, whichever comes first. Consult your owner's manual for exact intervals.</div>
+                <div class="accordion-body">Most vehicles need a routine check every 5,000â€“7,500 miles or every 6 months, whichever comes first. Consult your owner's manual for exact intervals.</div>
               </div>
             </div>
             <div class="accordion-item">
@@ -332,7 +332,7 @@
                 </button>
               </h2>
               <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#accordionFaq">
-                <div class="accordion-body">Simple services like oil changes take about 30 minutes. More complex repairs such as brake overhauls or engine diagnostics can take 2–4 hours.</div>
+                <div class="accordion-body">Simple services like oil changes take about 30 minutes. More complex repairs such as brake overhauls or engine diagnostics can take 2â€“4 hours.</div>
               </div>
             </div>
             <div class="accordion-item">
@@ -416,9 +416,9 @@
        FIELDS: name, email, date, time, subject, message
        ============================================= -->
   <script>
-    const API_BASE = ""; // Same origin — FastAPI serve kar raha hai yeh file
+    const API_BASE = ""; // Same origin â€” FastAPI serve kar raha hai yeh file
 
-    // ── Toast Helper ────────────────────────────────
+    // â”€â”€ Toast Helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     function showToast(message, type = "success") {
       const toast = document.getElementById("toast");
       toast.textContent = message;
@@ -431,7 +431,7 @@
       }, 4000);
     }
 
-    // ── Clear all errors ─────────────────────────────
+    // â”€â”€ Clear all errors â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     function clearErrors() {
       document.querySelectorAll(".error").forEach(el => el.textContent = "");
       document.querySelectorAll(".form-control, select").forEach(el => el.style.borderColor = "#e0e0e0");
@@ -443,7 +443,7 @@
       if (input) input.style.borderColor = "#dc3545";
     }
 
-    // ── Validate Form ────────────────────────────────
+    // â”€â”€ Validate Form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     function validateForm(data) {
       let valid = true;
       clearErrors();
@@ -459,7 +459,7 @@
       return valid;
     }
 
-    // ── Submit Handler ───────────────────────────────
+    // â”€â”€ Submit Handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     document.addEventListener("DOMContentLoaded", function () {
       const form = document.getElementById("appointmentForm");
       const submitBtn = document.getElementById("submitBtn");
@@ -505,16 +505,16 @@
           const json = await res.json();
 
           if (json.status === "success") {
-            showToast("✅ Appointment booked! ID: " + json.id, "success");
+            showToast("âœ… Appointment booked! ID: " + json.id, "success");
             form.reset();
             clearErrors();
           } else {
-            showToast("❌ Something went wrong. Please try again.", "error");
+            showToast("âŒ Something went wrong. Please try again.", "error");
           }
 
         } catch (err) {
           console.error("API Error:", err);
-          showToast("❌ Cannot connect to server. Make sure FastAPI is running on port 8000.", "error");
+          showToast("âŒ Cannot connect to server. Make sure FastAPI is running on port 8000.", "error");
         } finally {
           // 5. Restore button
           submitBtn.disabled = false;
@@ -524,5 +524,7 @@
     });
   </script>
 
+<script src="assets/js/garix-api.js"></script>
 </body>
 </html>
+

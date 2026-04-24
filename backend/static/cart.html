@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html class="no-js" lang="zxx">
 
 
@@ -217,14 +217,14 @@
                 Cow
                 Boy Hat</a>
               <span class="quantity">
-								1 × <span class="amount"><span>$</span>100.00</span>
+								1 Ã— <span class="amount"><span>$</span>100.00</span>
               </span>
             </li>
             <li class="mini_cart_item">
               <a href="shop.html" class="remove"><i class="fal fa-trash-alt"></i></a> <a href="shop.html"><img src="assets/img/shop/product-1-2.jpg" alt="Cart Image" />Cat Eye
                 Sunglasses</a>
               <span class="quantity">
-								1 × <span class="amount"><span>$</span>10.00</span>
+								1 Ã— <span class="amount"><span>$</span>10.00</span>
               </span>
             </li>
           </ul>
@@ -541,7 +541,7 @@
                           <option value="BD" selected="selected">Bangladesh</option>
                         </select></p>
                       <p><select class="form-select">
-                          <option value="">Select an option…</option>
+                          <option value="">Select an optionâ€¦</option>
                           <option value="BD-05">Bagerhat</option>
                           <option value="BD-01">Bandarban</option>
                           <option value="BD-02">Barguna</option>
@@ -781,8 +781,79 @@
   <script src="assets/js/jquery.event.move.js"></script>
   <!-- Main Js File -->
   <script src="assets/js/main.js"></script>
+<script src="assets/js/garix-api.js"></script>
+<script>
+// ===== CART PAGE - Real Time =====
+async function loadCart() {
+  try {
+    var res = await fetch("/api/cart");
+    var items = await res.json();
+    var tbody = document.querySelector(".cart_table tbody");
+    if (!tbody) return;
+
+    // Static rows hata do (sirf dynamic rows rakhenge)
+    var staticRows = tbody.querySelectorAll("tr.cart_item");
+    staticRows.forEach(function(row) { row.remove(); });
+
+    var insertBefore = tbody.querySelector("tr:last-child");
+
+    if (items.length === 0) {
+      var emptyRow = document.createElement("tr");
+      emptyRow.innerHTML = '<td colspan="6" style="text-align:center;padding:30px;color:#999;">Cart is empty! <a href="shop.html">Go Shopping</a></td>';
+      tbody.insertBefore(emptyRow, insertBefore);
+      return;
+    }
+
+    var total = 0;
+    items.forEach(function(item) {
+      var price = parseFloat(item.product_price.replace(/[^0-9.]/g, "")) || 0;
+      total += price * (item.quantity || 1);
+      var tr = document.createElement("tr");
+      tr.className = "cart_item";
+      tr.setAttribute("data-id", item._id);
+      tr.innerHTML = `
+        <td data-title="Product"><a class="cart-productimage" href="shop.html"><img width="100" height="95" src="${item.product_img}" alt="Image" onerror="this.src='assets/img/shop/product-1-1.jpg'"></a></td>
+        <td data-title="Name"><a class="cart-productname" href="shop.html">${item.product_name}</a></td>
+        <td data-title="Price"><span class="amount"><bdi><span>$</span>${price.toFixed(2)}</bdi></span></td>
+        <td data-title="Quantity"><div class="quantity style2"><div class="quantity__field"><div class="quantity__buttons"><button class="qty-btn quantity-plus"><i class="fal fa-plus"></i></button><input type="number" class="qty-input" value="${item.quantity || 1}" min="1" max="100"><button class="qty-btn quantity-minus"><i class="fal fa-minus"></i></button></div></div></div></td>
+        <td data-title="Total"><span class="amount"><bdi><span>$</span>${(price * (item.quantity || 1)).toFixed(2)}</bdi></span></td>
+        <td data-title="Remove"><a href="#" class="remove cart-remove-btn" data-id="${item._id}"><i class="fal fa-trash-alt"></i></a></td>
+      `;
+      tbody.insertBefore(tr, insertBefore);
+    });
+
+    // Total update karo
+    var totalEls = document.querySelectorAll(".cart_totals .amount bdi");
+    totalEls.forEach(function(el) { el.innerHTML = "<span>$</span>" + total.toFixed(2); });
+
+  } catch(err) { console.log("Cart load error:", err); }
+}
+
+// Remove button
+document.addEventListener("click", async function(e) {
+  var removeBtn = e.target.closest(".cart-remove-btn");
+  if (removeBtn) {
+    e.preventDefault();
+    var id = removeBtn.getAttribute("data-id");
+    try {
+      await fetch("/api/cart/" + id, { method: "DELETE" });
+      loadCart();
+    } catch(err) { console.log("Delete error:", err); }
+  }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+  // Cart page pe load karo
+  if (document.querySelector(".cart_table")) {
+    loadCart();
+  }
+});
+</script>
 </body>
 
 
 <!-- Mirrored from html.vecurosoft.com/garix/demo/cart.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 22 Apr 2026 08:10:28 GMT -->
 </html>
+
+
+<script src="assets/js/garix-api.js"></script>

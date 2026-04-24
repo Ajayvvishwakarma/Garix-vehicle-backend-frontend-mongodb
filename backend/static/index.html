@@ -1843,82 +1843,9 @@
   <script src="assets/js/jquery.event.move.js"></script>
   <!-- Main Js File -->
   <script src="assets/js/main.js"></script>
-<script>
-// ===== APPOINTMENT FORM API =====
-document.addEventListener("DOMContentLoaded", function() {
-  var form = document.querySelector("form.ajax-contact");
-  if (form) {
-    form.removeAttribute("action");
-    form.removeAttribute("method");
-    form.addEventListener("submit", async function(e) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      var btn = form.querySelector("button[type='submit']");
-      var orig = btn.innerHTML;
-      btn.innerHTML = "Sending...";
-      btn.disabled = true;
-      var fd = new FormData();
-      fd.append("name",    form.querySelector("[name='name']").value.trim());
-      fd.append("email",   form.querySelector("[name='email']").value.trim());
-      fd.append("date",    form.querySelector("[name='date']").value || new Date().toISOString().split('T')[0]);
-      fd.append("time",    form.querySelector("[name='time']").value || "00:00");
-      fd.append("subject", form.querySelector("[name='subject']").value);
-      fd.append("message", "");
-      try {
-        var res = await fetch("/api/appointment", { method: "POST", body: fd });
-        var data = await res.json();
-        if (data.status === "success") {
-          var msg = document.querySelector(".form-messages");
-          if (msg) { msg.style.color = "#28a745"; msg.textContent = "✅ Appointment booked! ID: " + data.id; }
-          form.reset();
-        } else {
-          alert("Something went wrong. Please try again.");
-        }
-      } catch(err) {
-        alert("Cannot connect to server.");
-      } finally {
-        btn.innerHTML = orig;
-        btn.disabled = false;
-      }
-    });
-  }
-
-  // ===== NEWSLETTER FORM API =====
-  var newsletter = document.querySelector("form.subscribe-block--style1");
-  if (newsletter) {
-    newsletter.addEventListener("submit", async function(e) {
-      e.preventDefault();
-      var emailInput = newsletter.querySelector("input");
-      if (!emailInput || !emailInput.value.trim()) return;
-      var fd = new FormData();
-      fd.append("name",    "Newsletter");
-      fd.append("email",   emailInput.value.trim());
-      fd.append("date",    new Date().toISOString().split('T')[0]);
-      fd.append("time",    "00:00");
-      fd.append("subject", "Newsletter Subscription");
-      fd.append("message", "");
-      try {
-        var res = await fetch("/api/appointment", { method: "POST", body: fd });
-        var data = await res.json();
-        if (data.status === "success") {
-          alert("✅ Subscribed successfully!");
-          emailInput.value = "";
-        }
-      } catch(err) {
-        alert("Cannot connect to server.");
-      }
-    });
-  }
-});
-</script>
+<script src="assets/js/garix-api.js"></script>
 </body>
 
 
 <!-- Mirrored from html.vecurosoft.com/garix/demo/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 22 Apr 2026 08:09:53 GMT -->
 </html>
-
-
-
-
-
-
