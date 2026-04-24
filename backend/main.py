@@ -198,6 +198,64 @@ def delete_plan_request(id: str):
     return {"message": msg}
 
 # SERVE STATIC FILES
+
+# ✅ PLACE ORDER
+@app.post("/api/order")
+async def place_order(
+    first_name: str = Form("Guest"),
+    last_name: str = Form("User"),
+    email: str = Form(""),
+    phone: str = Form(""),
+    address: str = Form(""),
+    city: str = Form(""),
+    country: str = Form(""),
+    postcode: str = Form(""),
+    payment_method: str = Form("cod"),
+    notes: str = Form(None),
+    razorpay_payment_id: str = Form(None),
+    payment_status: str = Form("pending"),
+):
+    from datetime import datetime
+    # Cart se items lo
+    cart_items = list(db["cart"].find())
+    total = sum(float(str(item.get("product_price","0")).replace("$","").split()[0]) for item in cart_items)
+    
+    order_data = {
+        "order_id": "ORD-" + datetime.now().strftime("%Y%m%d%H%M%S"),
+        "customer": {
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": email,
+            "phone": phone,
+            "address": address,
+            "city": city,
+            "country": country,
+            "postcode": postcode,
+        },
+        "items": [{k: str(v) for k, v in item.items()} for item in cart_items],
+        "total": total,
+        "payment_method": payment_method,
+        "notes": notes,
+        "payment_status": payment_status,
+        "razorpay_payment_id": razorpay_payment_id,
+        "status": "pending",
+        "date": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+    
+    result = db["orders"].insert_one(order_data)
+    
+    # Cart clear karo after order
+    db["cart"].delete_many({})
+    
+    return {"status": "success", "order_id": order_data["order_id"], "id": str(result.inserted_id)}
+
+@app.get("/api/orders")
+def get_orders():
+    data = []
+    for item in db["orders"].find().sort("_id", -1):
+        item["_id"] = str(item["_id"])
+        data.append(item)
+    return data
 @app.get("/{filename:path}")
 def serve_html(filename: str):
     filepath = os.path.join("static", filename)
@@ -214,3 +272,6 @@ if __name__ == "__main__":
     import uvicorn
     print("Starting Server...")
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+
+
+

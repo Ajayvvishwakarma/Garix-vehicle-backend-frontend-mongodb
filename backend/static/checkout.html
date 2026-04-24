@@ -800,9 +800,171 @@
   <!-- Main Js File -->
   <script src="assets/js/main.js"></script>
 <script src="assets/js/garix-api.js"></script>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+  var RAZORPAY_KEY = "rzp_test_ShIG6rwPKY0VQF";
+
+  // Cart items load karo
+  async function loadCheckoutItems() {
+    try {
+      var res = await fetch("/api/cart");
+      var items = await res.json();
+      var tbody = document.querySelector(".woocommerce-cart-form tbody");
+      if (!tbody) return;
+      tbody.innerHTML = "";
+      var total = 0;
+      items.forEach(function(item) {
+        var price = parseFloat(String(item.product_price).replace(/[^0-9.]/g,"")) || 0;
+        total += price;
+        var tr = document.createElement("tr");
+        tr.className = "cart_item";
+        tr.innerHTML = `
+          <td><a href="shop.html"><img width="91" height="91" src="${item.product_img}" alt="Image" onerror="this.src='assets/img/shop/product-1-1.jpg'"></a></td>
+          <td><a href="shop.html">${item.product_name}</a></td>
+          <td><span>$${price.toFixed(2)}</span></td>
+          <td><strong>${item.quantity || 1}</strong></td>
+          <td><span>$${price.toFixed(2)}</span></td>`;
+        tbody.appendChild(tr);
+      });
+      document.querySelectorAll(".checkout-ordertable .amount bdi").forEach(function(el) {
+        el.innerHTML = "<span>$</span>" + total.toFixed(2);
+      });
+      window._cartTotal = total;
+    } catch(err) { console.log("Cart load error:", err); }
+  }
+
+  if (document.querySelector(".vs-checkout-wrapper")) {
+    loadCheckoutItems();
+  }
+
+  // Place Order
+  var placeOrderBtn = document.querySelector(".place-order .vs-btn");
+  if (placeOrderBtn) {
+    placeOrderBtn.addEventListener("click", async function(e) {
+      e.preventDefault();
+
+      var form = document.querySelector(".woocommerce-checkout");
+      var inputs = form ? form.querySelectorAll("input[type='text']") : [];
+      var selects = form ? form.querySelectorAll("select") : [];
+      var paymentMethod = document.querySelector("input[name='payment_method']:checked");
+
+      var firstName  = inputs[0] ? inputs[0].value.trim() : "";
+      var lastName   = inputs[1] ? inputs[1].value.trim() : "";
+      var company    = inputs[2] ? inputs[2].value.trim() : "";
+      var address    = inputs[3] ? inputs[3].value.trim() : "";
+      var city       = inputs[4] ? inputs[4].value.trim() : "";
+      var email      = inputs[5] ? inputs[5].value.trim() : "";
+      var phone      = inputs[6] ? inputs[6].value.trim() : "";
+      var country    = selects[0] ? selects[0].value : "";
+      var pMethod    = paymentMethod ? paymentMethod.value : "cod";
+      var total      = window._cartTotal || 100;
+
+      // Razorpay options
+      var options = {
+        key: RAZORPAY_KEY,
+        amount: Math.round(total * 100), // Paise mein (INR)
+        currency: "INR",
+        name: "Garix Auto Shop",
+        description: "Order Payment",
+        image: "assets/img/logo.png",
+        prefill: {
+          name: firstName + " " + lastName,
+          email: email,
+          contact: phone
+        },
+        theme: { color: "#ff5e14" },
+        handler: async function(response) {
+          // Payment successful - order save karo
+          var fd = new FormData();
+          fd.append("first_name", firstName);
+          fd.append("last_name", lastName);
+          fd.append("email", email);
+          fd.append("phone", phone);
+          fd.append("address", address);
+          fd.append("city", city);
+          fd.append("country", country);
+          fd.append("postcode", inputs[7] ? inputs[7].value.trim() : "");
+          fd.append("payment_method", "razorpay");
+          fd.append("notes", "Razorpay Payment ID: " + response.razorpay_payment_id);
+          fd.append("razorpay_payment_id", response.razorpay_payment_id);
+          fd.append("payment_status", "paid");
+
+          try {
+            var res = await fetch("/api/order", { method: "POST", body: fd });
+            var data = await res.json();
+            if (data.status === "success") {
+              document.querySelector(".vs-checkout-wrapper").innerHTML = `
+                <div class="container text-center" style="padding:80px 20px;">
+                  <div style="font-size:80px;">✅</div>
+                  <h2 style="color:#28a745;margin:20px 0;">Payment Successful!</h2>
+                  <p style="font-size:18px;">Order ID: <strong>${data.order_id}</strong></p>
+                  <p style="font-size:16px;">Payment ID: <strong>${response.razorpay_payment_id}</strong></p>
+                  <p style="color:#666;margin-top:10px;">Thank you! Your order has been confirmed.</p>
+                  <a href="shop.html" class="vs-btn" style="margin-top:20px;display:inline-block;">Continue Shopping</a>
+                </div>`;
+            }
+          } catch(err) { alert("Order save error!"); }
+        },
+        modal: {
+          ondismiss: function() {
+            placeOrderBtn.textContent = "Place order";
+            placeOrderBtn.disabled = false;
+          }
+        }
+      };
+
+      // COD ke liye seedha order
+      if (pMethod === "bacs" || pMethod === "cheque" || pMethod === "cod") {
+        var fd = new FormData();
+        fd.append("first_name", firstName);
+        fd.append("last_name", lastName);
+        fd.append("email", email);
+        fd.append("phone", phone);
+        fd.append("address", address);
+        fd.append("city", city);
+        fd.append("country", country);
+        fd.append("postcode", inputs[7] ? inputs[7].value.trim() : "");
+        fd.append("payment_method", pMethod);
+        fd.append("notes", document.querySelector("textarea") ? document.querySelector("textarea").value : "");
+        fd.append("payment_status", "pending");
+
+        placeOrderBtn.textContent = "Processing...";
+        placeOrderBtn.disabled = true;
+
+        try {
+          var res = await fetch("/api/order", { method: "POST", body: fd });
+          var data = await res.json();
+          if (data.status === "success") {
+            document.querySelector(".vs-checkout-wrapper").innerHTML = `
+              <div class="container text-center" style="padding:80px 20px;">
+                <div style="font-size:80px;">✅</div>
+                <h2 style="color:#28a745;margin:20px 0;">Order Placed Successfully!</h2>
+                <p style="font-size:18px;">Order ID: <strong>${data.order_id}</strong></p>
+                <p style="color:#666;">We will contact you shortly for payment.</p>
+                <a href="shop.html" class="vs-btn" style="margin-top:20px;display:inline-block;">Continue Shopping</a>
+              </div>`;
+          }
+        } catch(err) { alert("Server error!"); }
+        return;
+      }
+
+      // Razorpay payment
+      placeOrderBtn.textContent = "Opening Payment...";
+      placeOrderBtn.disabled = true;
+      var rzp = new Razorpay(options);
+      rzp.open();
+    });
+  }
+});
+</script>
 </body>
 
 
 <!-- Mirrored from html.vecurosoft.com/garix/demo/checkout.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 22 Apr 2026 08:10:29 GMT -->
 </html>
+
+
 
