@@ -218,6 +218,15 @@ def delete_plan_request(id: str):
     msg = "Deleted" if result.deleted_count == 1 else "Not found"
     return {"message": msg}
 
+
+# Serve html.vecurosoft.com/garix/demo/index.html at the custom path
+@app.get("/html.vecurosoft.com/garix/demo/index.html")
+def serve_garix_demo_index():
+    filepath = os.path.join("static", "html.vecurosoft.com", "garix", "demo", "index.html")
+    if os.path.exists(filepath):
+        return FileResponse(filepath)
+    return HTMLResponse("<h2>File not found: html.vecurosoft.com/garix/demo/index.html</h2>", status_code=404)
+
 # SERVE STATIC FILES
 @app.get("/{filename:path}")
 def serve_html(filename: str):
