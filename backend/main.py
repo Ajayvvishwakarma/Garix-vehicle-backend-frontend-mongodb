@@ -91,6 +91,7 @@ async def add_to_cart(
     result = cart.insert_one({"product_name": product_name, "product_price": product_price, "product_img": product_img, "quantity": quantity, "date": date, "time": "time", "subject": "Cart Item Added", "message": "Added to Cart from Shop Page"})
     return {"status": "success", "id": str(result.inserted_id)}
 
+
 # 5. WISHLIST
 @app.post("/api/wishlist")
 async def add_to_wishlist(
@@ -103,6 +104,26 @@ async def add_to_wishlist(
     message: str = Form(None),
 ):
     result = wishlist.insert_one({"product_name": product_name, "product_price": product_price, "product_img": product_img, "date": date, "time": "time", "subject": "Wishlist Item Added", "message": "Added to Wishlist"})
+    return {"status": "success", "id": str(result.inserted_id)}
+
+# 6. PLAN REQUEST
+@app.post("/api/plan-request")
+async def create_plan_request(
+    name: str = Form(...),
+    email: str = Form(...),
+    date: str = Form(...),
+    time: str = Form(...),
+    subject: str = Form(...),
+    message: str = Form(None),
+):
+    result = pricing_requests.insert_one({
+        "name": name,
+        "email": email,
+        "date": date,
+        "time": time,
+        "subject": subject,
+        "message": message
+    })
     return {"status": "success", "id": str(result.inserted_id)}
 
 # --- GET REQUESTS ---
