@@ -91,7 +91,6 @@ async def add_to_cart(
     result = cart.insert_one({"product_name": product_name, "product_price": product_price, "product_img": product_img, "quantity": quantity, "date": date, "time": "time", "subject": "Cart Item Added", "message": "Added to Cart from Shop Page"})
     return {"status": "success", "id": str(result.inserted_id)}
 
-
 # 5. WISHLIST
 @app.post("/api/wishlist")
 async def add_to_wishlist(
@@ -104,26 +103,6 @@ async def add_to_wishlist(
     message: str = Form(None),
 ):
     result = wishlist.insert_one({"product_name": product_name, "product_price": product_price, "product_img": product_img, "date": date, "time": "time", "subject": "Wishlist Item Added", "message": "Added to Wishlist"})
-    return {"status": "success", "id": str(result.inserted_id)}
-
-# 6. PLAN REQUEST
-@app.post("/api/plan-request")
-async def create_plan_request(
-    name: str = Form(...),
-    email: str = Form(...),
-    date: str = Form(...),
-    time: str = Form(...),
-    subject: str = Form(...),
-    message: str = Form(None),
-):
-    result = pricing_requests.insert_one({
-        "name": name,
-        "email": email,
-        "date": date,
-        "time": time,
-        "subject": subject,
-        "message": message
-    })
     return {"status": "success", "id": str(result.inserted_id)}
 
 # --- GET REQUESTS ---
@@ -217,15 +196,6 @@ def delete_plan_request(id: str):
     result = pricing_requests.delete_one({"_id": ObjectId(id)})
     msg = "Deleted" if result.deleted_count == 1 else "Not found"
     return {"message": msg}
-
-
-# Serve html.vecurosoft.com/garix/demo/index.html at the custom path
-@app.get("/html.vecurosoft.com/garix/demo/index.html")
-def serve_garix_demo_index():
-    filepath = os.path.join("static", "html.vecurosoft.com", "garix", "demo", "index.html")
-    if os.path.exists(filepath):
-        return FileResponse(filepath)
-    return HTMLResponse("<h2>File not found: html.vecurosoft.com/garix/demo/index.html</h2>", status_code=404)
 
 # SERVE STATIC FILES
 @app.get("/{filename:path}")
