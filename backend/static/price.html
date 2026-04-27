@@ -1390,31 +1390,37 @@
   <script src="assets/js/jquery.event.move.js"></script>
   <!-- Main Js File -->
   <script src="assets/js/main.js"></script>
+
+
+
+<script src="assets/js/garix-api.js"></script>
+
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  
-  // ===== 1. BOTTOM APPOINTMENT FORM =====
-  var form = document.querySelector("form.form-style1");
-  if (form) {
-    form.removeAttribute("action");
-    form.removeAttribute("method");
+
+  // ===== 1. APPOINTMENT FORM (Bottom Section) =====
+  var appointForm = document.querySelector("form.form-style1");
+  if (appointForm) {
+    appointForm.removeAttribute("action");
+    appointForm.removeAttribute("method");
     
-    var btn = form.querySelector("button[type='submit']");
-    if(btn) {
-      btn.addEventListener("click", async function(e) {
+    var appointBtn = appointForm.querySelector("button[type='submit']");
+    if (appointBtn) {
+      appointBtn.addEventListener("click", async function(e) {
         e.preventDefault();
         e.stopPropagation();
         
-        var orig = btn.innerHTML;
-        btn.innerHTML = "Sending...";
-        btn.disabled = true;
-        
+        var orig = appointBtn.innerHTML;
+        appointBtn.innerHTML = "Sending...";
+        appointBtn.disabled = true;
+
         var fd = new FormData();
-        fd.append("name",    form.querySelector("[name='name']").value.trim());
-        fd.append("email",   form.querySelector("[name='email']").value.trim());
-        fd.append("date",    form.querySelector("[name='date']").value || new Date().toISOString().split('T')[0]);
-        fd.append("time",    form.querySelector("[name='time']").value || "00:00");
-        fd.append("subject", form.querySelector("[name='subject']").value);
+        fd.append("name",    appointForm.querySelector("[name='name']").value.trim());
+        fd.append("email",   appointForm.querySelector("[name='email']").value.trim());
+        fd.append("date",    appointForm.querySelector("[name='date']").value || new Date().toISOString().split('T')[0]);
+        fd.append("time",    appointForm.querySelector("[name='time']").value || "00:00");
+        fd.append("subject", appointForm.querySelector("[name='subject']").value);
         fd.append("message", "");
 
         try {
@@ -1422,119 +1428,27 @@ document.addEventListener("DOMContentLoaded", function() {
           var data = await res.json();
           if (data.status === "success") {
             alert("✅ Appointment booked successfully! ID: " + data.id);
-            form.reset();
-          } else {
-            alert("Something went wrong.");
+            appointForm.reset();
           }
         } catch(err) {
-          alert("Cannot connect to server.");
+          alert("Server Error! Please try again.");
         } finally {
-          btn.innerHTML = orig;
-          btn.disabled = false;
-        }
-      });
-    }
-  }
-
-  // ===== 2. PRICING CARDS BUTTONS (Submit Requests) =====
-  // Ye buttons plan select karne ke liye hain, unhe API pe bhejenge
-  var priceBtns = document.querySelectorAll(".price-block--style1 a.vs-btn");
-  
-  priceBtns.forEach(function(btn) {
-    btn.addEventListener("click", async function(e) {
-      e.preventDefault(); // Link redirect rokne ke liye
-      
-      var card = this.closest(".price-block--style1");
-      var planName = card.querySelector(".price-block__title").innerText;
-      var price = card.querySelector(".price-block__price").innerText;
-      
-      // User se details lo (Prompt ke through)
-      var name = prompt("Enter your Name for Plan: " + planName);
-      if (!name) return;
-      
-      var email = prompt("Enter your Email Address");
-      if (!email) return;
-
-      var orig = btn.innerHTML;
-      btn.innerHTML = "Sending...";
-      btn.style.pointerEvents = "none";
-
-      var fd = new FormData();
-      fd.append("name",    name);
-      fd.append("email",   email);
-      fd.append("date",    new Date().toISOString().split('T')[0]);
-      fd.append("time",    "00:00");
-      fd.append("subject", "Plan Request: " + planName + " " + price);
-      fd.append("message", "User is interested in this pricing plan.");
-
-      try {
-        var res = await fetch("/api/appointment", { method: "POST", body: fd });
-        var data = await res.json();
-        if (data.status === "success") {
-          alert("✅ Plan Request Sent! ID: " + data.id);
-        }
-      } catch(err) {
-        alert("Cannot connect to server.");
-      } finally {
-        btn.innerHTML = orig;
-        btn.style.pointerEvents = "auto";
-      }
-    });
-  });
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {  
-  // ===== 1. BOTTOM APPOINTMENT FORM =====
-  var form = document.querySelector("form.form-style1");
-  if (form) {
-    form.removeAttribute("action");
-    form.removeAttribute("method");
-    
-    var btn = form.querySelector("button[type='submit']");
-    if(btn) {
-      btn.addEventListener("click", async function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        var orig = btn.innerHTML;
-        btn.innerHTML = "Sending...";
-        btn.disabled = true;
-        
-        var fd = new FormData();
-        fd.append("name",    form.querySelector("[name='name']").value.trim());
-        fd.append("email",   form.querySelector("[name='email']").value.trim());
-        fd.append("date",    form.querySelector("[name='date']").value || new Date().toISOString().split('T')[0]);
-        fd.append("time",    form.querySelector("[name='time']").value || "00:00");
-        fd.append("subject", form.querySelector("[name='subject']").value);
-        fd.append("message", "");
-
-        try {
-          var res = await fetch("/api/appointment", { method: "POST", body: fd });
-          var data = await res.json();
-          if (data.status === "success") {
-            alert("✅ Appointment booked successfully!");
-            form.reset();
-          }
-        } catch(err) {
-          alert("Cannot connect to server.");
-        } finally {
-          btn.innerHTML = orig;
-          btn.disabled = false;
+          appointBtn.innerHTML = orig;
+          appointBtn.disabled = false;
         }
       });
     }
   }
 
   // ===== 2. PRICING CARDS BUTTONS =====
-  var priceBtns = document.querySelectorAll(".price-block--style1 a.vs-btn");  
+  var priceBtns = document.querySelectorAll(".price-block--style1 a.vs-btn");
   priceBtns.forEach(function(btn) {
     btn.addEventListener("click", async function(e) {
-      e.preventDefault();
+      e.preventDefault(); // Link click rokne ke liye
       
       var card = this.closest(".price-block--style1");
       var planName = card.querySelector(".price-block__title").innerText;
-      var price = card.querySelector(".price-block__price").innerText; 
+      var price = card.querySelector(".price-block__price").innerText;
       
       var name = prompt("Enter your Name for Plan: " + planName);
       if (!name) return;
@@ -1555,128 +1469,43 @@ document.addEventListener("DOMContentLoaded", function() {
       fd.append("message", "User is interested in this pricing plan.");
 
       try {
-        // NAYA API: /api/plan-request
         var res = await fetch("/api/plan-request", { method: "POST", body: fd });
         var data = await res.json();
         if (data.status === "success") {
           alert("✅ Plan Request Sent! ID: " + data.id);
         }
       } catch(err) {
-        alert("Cannot connect to server.");
+        alert("Server Error!");
       } finally {
         btn.innerHTML = orig;
         btn.style.pointerEvents = "auto";
       }
     });
   });
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function() {  
-  // ===== 1. BOTTOM APPOINTMENT FORM (Neeche wala) =====
-  var form = document.querySelector("form.form-style1");
-  if (form) {
-    form.removeAttribute("action");
-    form.removeAttribute("method");
-    
-    var btn = form.querySelector("button[type='submit']");
-    if(btn) {
-      btn.addEventListener("click", async function(e) {
-        e.preventDefault();
+
+  // ===== 3. NEWSLETTER FORM =====
+  var newsletterForm = document.querySelector("form.subscribe-block--style1");
+  if (newsletterForm) {
+    var subBtn = newsletterForm.querySelector("a.vs-btn");
+    var emailInput = newsletterForm.querySelector("input");
+
+    if (subBtn && emailInput) {
+      subBtn.addEventListener("click", async function(e) {
+        e.preventDefault(); // Refresh rokne ke liye
         e.stopPropagation();
-        
-        var orig = btn.innerHTML;
-        btn.innerHTML = "Sending...";
-        btn.disabled = true;
-        
+
+        if (!emailInput.value.trim()) {
+          alert("Please enter your email.");
+          return;
+        }
+
+        var orig = subBtn.innerHTML;
+        subBtn.innerHTML = "Subscribing...";
+        subBtn.style.pointerEvents = "none";
+
+        // Backend validation pass karne ke liye extra fields bhej rahe hain
         var fd = new FormData();
-        fd.append("name",    form.querySelector("[name='name']").value.trim());
-        fd.append("email",   form.querySelector("[name='email']").value.trim());
-        fd.append("date",    form.querySelector("[name='date']").value || new Date().toISOString().split('T')[0]);
-        fd.append("time",    form.querySelector("[name='time']").value || "00:00");
-        fd.append("subject", form.querySelector("[name='subject']").value);
-        fd.append("message", "");
-
-        try {
-          var res = await fetch("/api/appointment", { method: "POST", body: fd });
-          var data = await res.json();
-          if (data.status === "success") {
-            alert("✅ Appointment booked successfully!");
-            form.reset();
-          }
-        } catch(err) {
-          alert("Cannot connect to server.");
-        } finally {
-          btn.innerHTML = orig;
-          btn.disabled = false;
-        }
-      });
-    }
-  }
-
-  // ===== 2. PRICING CARDS BUTTONS (Upar wala) =====
-  var priceBtns = document.querySelectorAll(".price-block--style1 a.vs-btn");  
-  priceBtns.forEach(function(btn) {
-    btn.addEventListener("click", async function(e) {
-      e.preventDefault(); 
-      
-      var card = this.closest(".price-block--style1");
-      var planName = card.querySelector(".price-block__title").innerText;
-      var price = card.querySelector(".price-block__price").innerText; 
-      
-      var name = prompt("Enter your Name for Plan: " + planName);
-      if (!name) return;
-      
-      var email = prompt("Enter your Email Address");
-      if (!email) return;
-
-      var orig = btn.innerHTML;
-      btn.innerHTML = "Sending...";
-      btn.style.pointerEvents = "none";
-
-      var fd = new FormData();
-      fd.append("name",    name);
-      fd.append("email",   email);
-      fd.append("date",    new Date().toISOString().split('T')[0]);
-      fd.append("time",    "00:00");
-      fd.append("subject", "Plan Request: " + planName + " " + price);
-      fd.append("message", "User is interested in this pricing plan.");
-
-      try {
-        var res = await fetch("/api/plan-request", { method: "POST", body: fd });
-        var data = await res.json();
-        if (data.status === "success") {
-          alert("✅ Plan Request Sent! ID: " + data.id);
-        }
-      } catch(err) {
-        alert("Cannot connect to server.");
-      } finally {
-        btn.innerHTML = orig;
-        btn.style.pointerEvents = "auto";
-      }
-    });
-  });
-
-  // ===== 3. NEWSLETTER FORM (Footer mein jo hai) =====
-  var newsletter = document.querySelector("form.subscribe-block--style1");
-  if (newsletter) {
-    var nBtn = newsletter.querySelector("a.vs-btn");
-    if (nBtn) {
-      nBtn.addEventListener("click", async function(e) {
-        e.preventDefault(); // Page redirect rokne ke liye
-        
-        var emailInput = newsletter.querySelector("input");
-        if (!emailInput || !emailInput.value.trim()) {
-            alert("Please enter your email.");
-            return;
-        }
-
-        var orig = nBtn.innerHTML;
-        nBtn.innerHTML = "Sending...";
-        nBtn.style.pointerEvents = "none";
-
-        var fd = new FormData();
-        fd.append("name",    "Newsletter User");
+        fd.append("name",    "Newsletter Subscriber");
         fd.append("email",   emailInput.value.trim());
         fd.append("date",    new Date().toISOString().split('T')[0]);
         fd.append("time",    "00:00");
@@ -1684,30 +1513,32 @@ document.addEventListener("DOMContentLoaded", function() {
         fd.append("message", "Subscribed from Pricing Page");
 
         try {
-          // API call
           var res = await fetch("/api/subscribe", { method: "POST", body: fd });
           var data = await res.json();
           if (data.status === "success") {
-            alert("✅ Subscribed successfully! ID: " + data.id);
-            emailInput.value = ""; // Input clear karo
+            alert("✅ Successfully Subscribed! We will keep you updated.");
+            emailInput.value = "";
           }
         } catch(err) {
-          alert("Cannot connect to server.");
+          alert("Server Error!");
         } finally {
-          nBtn.innerHTML = orig;
-          nBtn.style.pointerEvents = "auto";
+          subBtn.innerHTML = orig;
+          subBtn.style.pointerEvents = "auto";
         }
       });
     }
   }
+
 });
 </script>
-<script src="assets/js/garix-api.js"></script>
 </body>
 
 
 <!-- Mirrored from html.vecurosoft.com/garix/demo/price.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 22 Apr 2026 08:10:29 GMT -->
 </html>
+
+
+
 
 
 

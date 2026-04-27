@@ -1936,89 +1936,108 @@
   <script src="assets/js/jquery.event.move.js"></script>
   <!-- Main Js File -->
   <script src="assets/js/main.js"></script>
+
+<script src="assets/js/garix-api.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // ===== 1. PATIENT APPOINTMENT FORM =====
-  var form = document.querySelector("form.ajax-contact");
-  if (form) {
-    form.removeAttribute("action");
-    form.removeAttribute("method");
-    form.addEventListener("submit", async function(e) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      var btn = form.querySelector("button[type='submit']");
-      var orig = btn.innerHTML;
-      btn.innerHTML = "Sending...";
-      btn.disabled = true;
-      
-      var fd = new FormData();
-      fd.append("name",    form.querySelector("[name='name']").value.trim());
-      fd.append("email",   form.querySelector("[name='email']").value.trim());
-      fd.append("date",    form.querySelector("[name='date']").value || new Date().toISOString().split('T')[0]);
-      fd.append("time",    form.querySelector("[name='time']").value || "00:00");
-      fd.append("subject", form.querySelector("[name='subject']").value);
-      fd.append("message", "");
 
-      try {
-        var res = await fetch("/api/appointment", { method: "POST", body: fd });
-        var data = await res.json();
-        if (data.status === "success") {
-          var msg = form.parentElement.querySelector(".form-messages");
-          if (msg) { 
-            msg.style.color = "#28a745"; 
-            msg.textContent = "✅ Appointment booked successfully! ID: " + data.id; 
-          } else {
-            alert("✅ Appointment booked!");
+  // ===== APPOINTMENT FORM (Form inside Hero section) =====
+  var appointForm = document.querySelector("form.ajax-contact");
+  if (appointForm) {
+    appointForm.removeAttribute("action");
+    appointForm.removeAttribute("method");
+    
+    var btn = appointForm.querySelector("button.vs-btn"); // Selecting by class
+    if (btn) {
+        btn.addEventListener("click", async function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          var orig = btn.innerHTML;
+          btn.innerHTML = "Sending...";
+          btn.disabled = true;
+
+          var fd = new FormData();
+          fd.append("name",    appointForm.querySelector("[name='name']").value.trim());
+          fd.append("email",   appointForm.querySelector("[name='email']").value.trim());
+          fd.append("date",    appointForm.querySelector("[name='date']").value || new Date().toISOString().split('T')[0]);
+          fd.append("time",    appointForm.querySelector("[name='time']").value || "00:00");
+          fd.append("subject", appointForm.querySelector("[name='subject']").value);
+          fd.append("message", "");
+
+          try {
+            var res = await fetch("/api/appointment", { method: "POST", body: fd });
+            var data = await res.json();
+            if (data.status === "success") {
+              alert("✅ Appointment booked successfully! ID: " + data.id);
+              appointForm.reset();
+            }
+          } catch(err) {
+            alert("Server Error! Please try again.");
+          } finally {
+            btn.innerHTML = orig;
+            btn.disabled = false;
           }
-          form.reset();
-        } else {
-          alert("Something went wrong. Please try again.");
-        }
-      } catch(err) {
-        alert("Cannot connect to server.");
-      } finally {
-        btn.innerHTML = orig;
-        btn.disabled = false;
-      }
-    });
+        });
+    }
   }
 
-  // ===== 2. NEWSLETTER FORM =====
-  var newsletter = document.querySelector("form.subscribe-block--style1");
-  if (newsletter) {
-    newsletter.addEventListener("submit", async function(e) {
-      e.preventDefault();
-      var emailInput = newsletter.querySelector("input");
-      if (!emailInput || !emailInput.value.trim()) return;
+  // ===== NEWSLETTER FORM (Footer section) =====
+  var newsletterForm = document.querySelector("form.subscribe-block--style1");
+  if (newsletterForm) {
+    newsletterForm.removeAttribute("action"); // Refresh rokne ke liye
+    // newsletterForm.removeAttribute("method"); // Optional cleanup
+    
+    var subBtn = newsletterForm.querySelector("a.vs-btn");
+    var emailInput = newsletterForm.querySelector("input");
 
-      var fd = new FormData();
-      fd.append("name",    "Newsletter");
-      fd.append("email",   emailInput.value.trim());
-      fd.append("date",    new Date().toISOString().split('T')[0]);
-      fd.append("time",    "00:00");
-      fd.append("subject", "Newsletter Subscription");
-      fd.append("message", "");
+    if (subBtn && emailInput) {
+      subBtn.addEventListener("click", async function(e) {
+        e.preventDefault(); // Link navigation rokne ke liye (ZAROORI)
+        e.stopPropagation();
 
-      try {
-        var res = await fetch("/api/subscribe", { method: "POST", body: fd });
-        var data = await res.json();
-        if (data.status === "success") {
-          alert("✅ Subscribed successfully!");
-          emailInput.value = "";
+        if (!emailInput.value.trim()) {
+            alert("Please enter your email address.");
+            return;
         }
-      } catch(err) {
-        alert("Cannot connect to server.");
-      }
-    });
+
+        var orig = subBtn.innerHTML;
+        subBtn.innerHTML = "Subscribing...";
+        subBtn.style.pointerEvents = "none";
+
+        var fd = new FormData();
+        fd.append("name",    "Index 2 Subscriber");
+        fd.append("email",   emailInput.value.trim());
+        fd.append("date",    new Date().toISOString().split('T')[0]);
+        fd.append("time",    "00:00");
+        fd.append("subject", "Newsletter Subscription");
+        fd.append("message", "Subscribed from Index 2 Page");
+
+        try {
+          var res = await fetch("/api/subscribe", { method: "POST", body: fd });
+          var data = await res.json();
+          if (data.status === "success") {
+            alert("✅ Successfully Subscribed! We will keep you updated.");
+            emailInput.value = "";
+          }
+        } catch(err) {
+          alert("Server Error: " + err.message);
+        } finally {
+          subBtn.innerHTML = orig;
+          subBtn.style.pointerEvents = "auto";
+        }
+      });
+    }
   }
+
 });
 </script>
-<script src="assets/js/garix-api.js"></script>
 </body>
 
 
 <!-- Mirrored from html.vecurosoft.com/garix/demo/index-2.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 22 Apr 2026 08:10:12 GMT -->
 </html>
+
 
 
 
