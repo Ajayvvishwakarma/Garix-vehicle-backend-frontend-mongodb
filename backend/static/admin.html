@@ -8,227 +8,552 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Google Fonts (Inter) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+  // LIVE CLOCK FUNCTION
+  function startClock() {
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('liveTime').innerText = now.toLocaleTimeString();
+        document.getElementById('liveDate').innerText = now.toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+    }, 1000);
+  }
+
+  // PDF GENERATOR FUNCTION
+  function generatePDF() {
+    const element = document.getElementById('page-dashboard');
+    const opt = {
+      margin:       0.5,
+      filename:     'Garix_Report_' + new Date().toISOString().slice(0,10) + '.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    
+    // Show alert
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    
+    html2pdf().set(opt).from(element).save().then(() => {
+        btn.innerHTML = originalText;
+    });
+  }
+  
+  // Start clock on load
+  startClock();
+
+</script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js">
+  // LIVE CLOCK FUNCTION
+  function startClock() {
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('liveTime').innerText = now.toLocaleTimeString();
+        document.getElementById('liveDate').innerText = now.toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+    }, 1000);
+  }
+
+  // PDF GENERATOR FUNCTION
+  function generatePDF() {
+    const element = document.getElementById('page-dashboard');
+    const opt = {
+      margin:       0.5,
+      filename:     'Garix_Report_' + new Date().toISOString().slice(0,10) + '.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    
+    // Show alert
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    
+    html2pdf().set(opt).from(element).save().then(() => {
+        btn.innerHTML = originalText;
+    });
+  }
+  
+  // Start clock on load
+  startClock();
+
+</script>
 
   <style>
     :root {
-      --bg-body: #f0f2f5;
+      --bg-body: #f3f4f6;
       --bg-card: #ffffff;
-      --text-main: #333333;
-      --text-muted: #6c757d;
-      --sidebar-bg: #2c3e50;
-      --sidebar-active: #34495e;
-      --accent: #4e73df;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --sidebar-bg: #111827;
+      --sidebar-active: #2563eb;
+      --accent: #2563eb;
+      --glass: rgba(255, 255, 255, 0.8);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
     
-    /* Dark Mode Variables */
     body.dark-mode {
-      --bg-body: #1a1d21;
-      --bg-card: #262b2f;
-      --text-main: #e0e0e0;
-      --text-muted: #a0a0a0;
-      --sidebar-bg: #121417;
-      --sidebar-active: #1f2329;
+      --bg-body: #0f172a;
+      --bg-card: #1e293b;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --sidebar-bg: #020617;
+      --glass: rgba(30, 41, 59, 0.8);
     }
 
     body { 
       background-color: var(--bg-body); 
       color: var(--text-main); 
-      font-family: 'Poppins', sans-serif; 
-      transition: background 0.3s, color 0.3s;
+      font-family: 'Inter', sans-serif; 
+      transition: background 0.3s;
+      overflow-x: hidden; /* Prevent horizontal scroll */
+    }
+
+    /* PREMIUM SIDEBAR */
+    .sidebar {
+      min-height: 100vh; 
+      background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+      color: #d1d5db;
+      transition: all 0.3s ease;
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: 260px;
+      z-index: 1030;
     }
     
-    .sidebar {
-      min-height: 100vh; background-color: var(--sidebar-bg); color: white;
-      transition: background 0.3s;
+    /* Mobile Responsiveness for Sidebar */
+    @media (max-width: 768px) {
+        .sidebar {
+            transform: translateX(-100%); /* Hidden by default on mobile */
+        }
+        .sidebar.active {
+            transform: translateX(0); /* Slide in */
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 1020;
+        }
+        .sidebar-overlay.active { display: block; }
+    }
+    @media (min-width: 769px) {
+        .sidebar-overlay { display: none !important; }
+    }
+    
+    .sidebar-brand {
+        height: 70px; display: flex; align-items: center; justify-content: center;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
     }
     
     .sidebar .nav-link { 
-      color: #adb5bd; margin-bottom: 5px; border-radius: 5px; padding: 12px 15px;
-      transition: all 0.2s;
+      color: #9ca3af; padding: 12px 20px; margin: 4px 12px;
+      border-radius: 8px; display: flex; align-items: center;
+      font-weight: 500; font-size: 0.95rem; transition: all 0.2s;
     }
-    .sidebar .nav-link:hover, .sidebar .nav-link.active { 
-      background-color: var(--accent); color: white; box-shadow: 0 4px 6px rgba(78,115,223,0.4);
+    .sidebar .nav-link i { width: 24px; margin-right: 12px; }
+    .sidebar .nav-link:hover { background: rgba(255,255,255,0.05); color: white; }
+    .sidebar .nav-link.active { 
+      background: var(--sidebar-active); color: white; 
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
 
-    .stats-card { 
-      border: none; border-radius: 15px; 
-      background-color: var(--bg-card);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
-      color: var(--text-main);
-      transition: transform 0.2s, background 0.3s;
-    }
-    .stats-card:hover { transform: translateY(-5px); }
-
-    .main-content { min-height: 100vh; padding-top: 80px; } /* Space for navbar */
-    
+    /* GLASS NAVBAR */
     .glass-nav {
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(10px);
+      background: var(--glass);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(0,0,0,0.05);
+      height: 70px;
     }
-    body.dark-mode .glass-nav { background: rgba(38, 43, 47, 0.9); border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-    .login-card { 
-      width: 100%; max-width: 400px; padding: 2.5rem; 
-      border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+    /* CARDS */
+    .card-stats { 
+      border: none; border-radius: 16px; 
       background: var(--bg-card); color: var(--text-main);
+      box-shadow: var(--shadow); transition: transform 0.2s;
+    }
+    .card-stats:hover { transform: translateY(-3px); }
+
+    .card-main {
+        background: var(--bg-card); border: none; border-radius: 16px;
+        box-shadow: var(--shadow); color: var(--text-main);
     }
 
-    .table-card {
-      background: var(--bg-card);
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    .table-card { background: transparent; }
+    .table thead th { border: none; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .table td { border-bottom: 1px solid rgba(0,0,0,0.05); color: var(--text-main); vertical-align: middle; }
+
+    /* LOGIN CARD */
+    .login-card { 
+      width: 100%; max-width: 420px; padding: 2.5rem; 
+      border-radius: 24px; background: var(--bg-card); 
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
       color: var(--text-main);
     }
 
-    .table thead th {
-      background-color: var(--sidebar-bg);
-      color: white;
-      border: none;
+    /* PROFILE CARD */
+    .profile-cover {
+        height: 150px; background: linear-gradient(to right, #4f46e5, #06b6d4); border-radius: 16px 16px 0 0;
     }
-    .table td { color: var(--text-main); border-color: rgba(0,0,0,0.1); }
-    
+    .profile-avatar {
+        width: 100px; height: 100px; border-radius: 50%; border: 4px solid var(--bg-card);
+        background: var(--bg-card); margin-top: -50px; display: flex; align-items: center; justify-content: center;
+        font-size: 2.5rem; color: var(--accent); box-shadow: var(--shadow);
+    }
+
+    .sidebar .small { color: #e5e7eb !important; font-weight: 600; letter-spacing: 0.05em; }
+    .sidebar .nav-link { color: #d1d5db; }
     .hidden { display: none !important; }
-    
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #6c757d; }
   </style>
 </head>
 <body>
 
 <!-- LOGIN -->
 <div id="login-section" style="min-height:100vh; display:flex; align-items:center; justify-content:center; background: var(--bg-body);">
-  <div class="login-card text-center">
-    <h3 class="fw-bold mb-4" style="color: var(--accent);">Garix Admin</h3>
+  <div class="login-card text-center position-relative overflow-hidden">
+    <!-- Decor -->
+    <div style="position: absolute; top:-50px; left:-50px; width:150px; height:150px; background:rgba(37,99,235,0.1); border-radius:50%;"></div>
+    
+    <div class="mb-4">
+        <div class="profile-avatar mx-auto" style="margin-top:0; width:80px; height:80px; font-size:2rem;"><i class="fas fa-user-shield"></i></div>
+    </div>
+    <h3 class="fw-bold mb-1" style="color: var(--accent);">Garix Admin</h3>
+    <p class="text-muted small mb-4">Enter your credentials to access</p>
     <form id="login-form">
-      <div class="mb-3 text-start"><label class="form-label small">Email</label><input type="text" id="username" class="form-control border-0 bg-light" placeholder="soni@gmail.com" required></div>
-      <div class="mb-3 text-start"><label class="form-label small">Password</label><input type="password" id="password" class="form-control border-0 bg-light" placeholder="12345678" required></div>
-      <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--accent); border:none; padding:10px;">LOGIN</button>
+      <div class="mb-3 text-start"><label class="form-label small fw-bold">Email Address</label><input type="text" id="username" class="form-control border-0 bg-light" style="background:var(--bg-body) !important; color:var(--text-main)" placeholder="soni@gmail.com" required></div>
+      <div class="mb-3 text-start"><label class="form-label small fw-bold">Password</label><input type="password" id="password" class="form-control border-0 bg-light" style="background:var(--bg-body) !important; color:var(--text-main)" placeholder="••••••••" required></div>
+      <button type="submit" class="btn btn-primary w-100 fw-bold py-2 rounded-3" style="background: var(--accent); border:none; box-shadow:0 4px 6px rgba(37,99,235,0.3);">LOGIN</button>
       <p id="login-error" class="text-danger mt-3 small mb-0"></p>
     </form>
   </div>
 </div>
 
 <!-- MAIN DASHBOARD -->
-<div id="dashboard-section" class="container-fluid hidden" style="padding-left: 0; padding-right: 0;">
+<div id="dashboard-section" class="container-fluid hidden" style="padding:0; margin:0;">
   
-  <!-- TOP NAVBAR -->
-  <nav class="navbar navbar-expand-lg fixed-top glass-nav px-4">
-    <a class="navbar-brand fw-bold" href="#" style="color: var(--accent);">GARIX <span class="badge bg-dark rounded-pill small">PRO</span></a>
-    
-    <div class="d-flex align-items-center gap-3">
-        <!-- Dark Mode Toggle -->
-        <button class="btn btn-sm btn-outline-dark" id="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+  <!-- MOBILE SIDEBAR OVERLAY -->
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="mainSidebar">
+    <div class="sidebar-brand">
+        <h5 class="fw-bold m-0 text-white"><i class="fas fa-bolt text-warning me-2"></i>GARIX</h5>
+    </div>
+    <div class="d-flex flex-column justify-content-between h-100 pb-4" style="height: calc(100vh - 70px);">
+        <ul class="nav flex-column px-2 mt-3">
+            <div class="small text-uppercase text-muted fw-bold px-3 mb-2" style="font-size:0.75rem; letter-spacing:1px;">Main</div>
+            <li class="nav-item"><a href="#" class="nav-link active" onclick="showPage('dashboard')"><i class="fas fa-th-large"></i> Dashboard</a></li>
+            <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('orders')"><i class="fas fa-shopping-bag"></i> Orders</a></li>
+            <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('appointments')"><i class="fas fa-calendar-alt"></i> Appointments</a></li>
+            
+            <div class="small text-uppercase text-muted fw-bold px-3 mb-2 mt-4" style="font-size:0.75rem; letter-spacing:1px;">Management</div>
+            <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('contacts')"><i class="fas fa-envelope"></i> Contacts</a></li>
+            <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('cart')"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+            <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('wishlist')"><i class="fas fa-heart"></i> Wishlist</a></li>
+        </ul>
         
+        <div class="px-2">
+            <button class="btn btn-danger w-100 rounded-3 small" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i> Logout</button>
+        </div>
+    </div>
+  </div>
+
+  <!-- TOP NAVBAR -->
+  <nav class="navbar navbar-expand-lg fixed-top glass-nav px-4 d-flex justify-content-between align-items-center" style="z-index: 1020;">
+    <!-- Left: Search & Toggle -->
+    <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-light d-md-none rounded-circle" onclick="toggleSidebar()"><i class="fas fa-bars text-dark"></i></button>
+        <div class="d-none d-md-block position-relative">
+            <input type="text" class="form-control ps-5 rounded-pill border-0" style="width:250px; background:var(--bg-body);" placeholder="Search...">
+            <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+        </div>
+        <h5 class="m-0 fw-bold d-none d-lg-block" style="color: var(--text-main);">Dashboard</h5>
+    </div>
+    
+    <!-- Right: Clock, Theme, Notification, Profile -->
+    <div class="d-flex align-items-center gap-3">
+        <!-- Live Clock -->
+        <div class="d-none d-md-flex flex-column text-end me-2">
+            <span id="liveTime" class="fw-bold small" style="color:var(--text-main)">12:00:00</span>
+            <span id="liveDate" class="text-muted" style="font-size:0.7rem;">Jan 01, 2024</span>
+        </div>
+
+        <!-- Theme Toggle -->
+        <button class="btn btn-sm border-0 bg-transparent" id="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon text-muted"></i></button>
+        
+        <!-- Notifications -->
+        <div class="dropdown">
+            <a href="#" class="position-relative text-decoration-none" data-bs-toggle="dropdown">
+                <i class="fas fa-bell text-muted fa-lg"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.6rem;">3</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2" style="width: 280px; border-radius: 12px;">
+                <li class="small fw-bold text-muted px-2 mb-2">Notifications</li>
+                <li><a href="#" class="dropdown-item small rounded-2 py-2 mb-1 d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle me-2 p-2" style="width:30px; height:30px;"><i class="fas fa-shopping-cart"></i></div>
+                    <div>
+                        <span class="d-block fw-bold">New Order</span>
+                        <span class="d-block text-muted" style="font-size:0.7rem">2 mins ago</span>
+                    </div>
+                </a></li>
+                <li><a href="#" class="dropdown-item small rounded-2 py-2 mb-1 d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle me-2 p-2" style="width:30px; height:30px;"><i class="fas fa-user"></i></div>
+                    <div>
+                        <span class="d-block fw-bold">New User</span>
+                        <span class="d-block text-muted" style="font-size:0.7rem">1 hour ago</span>
+                    </div>
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a href="#" class="dropdown-item text-center text-primary small fw-bold">View All</a></li>
+            </ul>
+        </div>
+
         <!-- Profile -->
         <div class="dropdown">
             <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
-                <div class="bg-primary rounded-circle d-flex justify-content-center align-items-center text-white" style="width:35px; height:35px;">A</div>
+                <div class="bg-primary rounded-circle d-flex justify-content-center align-items-center text-white fw-bold" style="width:35px; height:35px;">A</div>
             </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#" onclick="showProfile()">Profile</a></li>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" style="border-radius: 12px;">
+                <li><a class="dropdown-item" href="#" onclick="showProfile()"><i class="fas fa-user-circle me-2 text-muted"></i> Profile</a></li>
+                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2 text-muted"></i> Settings</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="#" onclick="logout()">Logout</a></li>
+                <li><a class="dropdown-item text-danger" href="#" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
             </ul>
         </div>
     </div>
   </nav>
 
-  <div class="row g-0">
-    <!-- SIDEBAR -->
-    <div class="col-md-2 sidebar d-none d-md-block pt-5">
-      <ul class="nav flex-column px-2">
-        <li class="nav-item"><a href="#" class="nav-link active" onclick="showPage('dashboard')"><i class="fas fa-chart-line me-2"></i> Dashboard</a></li>
-        <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('orders')"><i class="fas fa-shopping-bag me-2"></i> Orders</a></li>
-        <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('appointments')"><i class="fas fa-calendar-check me-2"></i> Appointments</a></li>
-        <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('contacts')"><i class="fas fa-envelope-open-text me-2"></i> Contacts</a></li>
-        <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('cart')"><i class="fas fa-shopping-cart me-2"></i> Cart</a></li>
-        <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('wishlist')"><i class="fas fa-heart me-2"></i> Wishlist</a></li>
-      </ul>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div class="col-md-10 main-content p-4">
+  <!-- MAIN CONTENT -->
+  <div style="margin-left: 260px; padding-top: 90px; padding-right: 20px; padding-bottom: 20px; transition: margin 0.3s;" id="mainContentArea">
+    <div class="p-2 p-md-4">
       
-      <!-- DASHBOARD PAGE -->
       <div id="page-dashboard">
-        <h3 class="fw-bold mb-4">Overview</h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold" style="color: var(--text-main);">Overview</h3>
+            <button class="btn btn-sm btn-primary rounded-3 shadow-sm" onclick="generatePDF()"><i class="fas fa-file-pdf me-1"></i> Download Report</button>
+        </div>
         
-        <!-- Stats Row -->
+        <!-- Stats Grid -->
         <div class="row g-4 mb-4">
           <div class="col-md-3">
-            <div class="card stats-card p-3 h-100">
-                <div class="d-flex justify-content-between"><div><h6 class="text-muted">Total Orders</h6><h3 class="fw-bold" id="stat-orders">0</h3></div><i class="fas fa-box fa-2x text-primary opacity-25"></i></div>
-                <small class="text-success"><i class="fas fa-arrow-up"></i> +12% this week</small>
+            <div class="card-stats p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><h6 class="text-muted fw-light mb-1">Total Orders</h6><h2 class="fw-bold mb-0" id="stat-orders">0</h2></div>
+                    <div class="p-2 bg-primary bg-opacity-10 rounded-2 text-primary"><i class="fas fa-box"></i></div>
+                </div>
+                <small class="text-success mt-3 d-block"><i class="fas fa-arrow-up small"></i> 12% increase</small>
             </div>
           </div>
           <div class="col-md-3">
-            <div class="card stats-card p-3 h-100">
-                <div class="d-flex justify-content-between"><div><h6 class="text-muted">Revenue</h6><h3 class="fw-bold text-success" id="stat-revenue">$0</h3></div><i class="fas fa-coins fa-2x text-success opacity-25"></i></div>
-                <small class="text-success"><i class="fas fa-arrow-up"></i> +5% this month</small>
+            <div class="card-stats p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><h6 class="text-muted fw-light mb-1">Revenue</h6><h2 class="fw-bold text-success mb-0" id="stat-revenue">$0</h2></div>
+                    <div class="p-2 bg-success bg-opacity-10 rounded-2 text-success"><i class="fas fa-dollar-sign"></i></div>
+                </div>
+                <small class="text-success mt-3 d-block"><i class="fas fa-arrow-up small"></i> 5.2% increase</small>
             </div>
           </div>
           <div class="col-md-3">
-            <div class="card stats-card p-3 h-100">
-                <div class="d-flex justify-content-between"><div><h6 class="text-muted">Appointments</h6><h3 class="fw-bold text-warning" id="stat-appointments">0</h3></div><i class="fas fa-calendar-alt fa-2x text-warning opacity-25"></i></div>
-                <small class="text-muted">Pending actions</small>
+            <div class="card-stats p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><h6 class="text-muted fw-light mb-1">Appointments</h6><h2 class="fw-bold text-warning mb-0" id="stat-appointments">0</h2></div>
+                    <div class="p-2 bg-warning bg-opacity-10 rounded-2 text-warning"><i class="fas fa-calendar"></i></div>
+                </div>
+                <small class="text-muted mt-3 d-block">8 pending requests</small>
             </div>
           </div>
           <div class="col-md-3">
-            <div class="card stats-card p-3 h-100">
-                <div class="d-flex justify-content-between"><div><h6 class="text-muted">Users</h6><h3 class="fw-bold text-info" id="stat-users">0</h3></div><i class="fas fa-users fa-2x text-info opacity-25"></i></div>
-                <small class="text-info">Active now</small>
+            <div class="card-stats p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><h6 class="text-muted fw-light mb-1">Users</h6><h2 class="fw-bold text-info mb-0" id="stat-users">0</h2></div>
+                    <div class="p-2 bg-info bg-opacity-10 rounded-2 text-info"><i class="fas fa-users"></i></div>
+                </div>
+                <small class="text-info mt-3 d-block">New users today</small>
             </div>
           </div>
         </div>
 
-        <!-- Charts Row -->
+        <!-- Charts + Activity -->
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card-main p-4 h-100">
+                    <h5 class="fw-bold mb-3">Revenue Analytics</h5>
+                    <canvas id="revenueChart" style="height: 320px;"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <!-- Activity Feed -->
+                <div class="card-main p-4 h-100">
+                    <h5 class="fw-bold mb-3">Recent Activity</h5>
+                    <div class="d-flex flex-column gap-3">
+                        <!-- Item 1 -->
+                        <div class="d-flex align-items-start">
+                            <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3" style="margin-top:2px;"><i class="fas fa-shopping-cart"></i></div>
+                            <div>
+                                <h6 class="small fw-bold mb-0">New Order #1024</h6>
+                                <p class="small text-muted mb-0">Customer placed an order for <span class="fw-bold">$250.00</span></p>
+                                <small class="text-muted" style="font-size:0.7rem">5 mins ago</small>
+                            </div>
+                        </div>
+                        <!-- Item 2 -->
+                        <div class="d-flex align-items-start">
+                            <div class="bg-success bg-opacity-10 text-success rounded-circle p-2 me-3" style="margin-top:2px;"><i class="fas fa-check"></i></div>
+                            <div>
+                                <h6 class="small fw-bold mb-0">Payment Received</h6>
+                                <p class="small text-muted mb-0">Order #1020 payment successful</p>
+                                <small class="text-muted" style="font-size:0.7rem">25 mins ago</small>
+                            </div>
+                        </div>
+                        <!-- Item 3 -->
+                        <div class="d-flex align-items-start">
+                            <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-2 me-3" style="margin-top:2px;"><i class="fas fa-user-plus"></i></div>
+                            <div>
+                                <h6 class="small fw-bold mb-0">New User Registered</h6>
+                                <p class="small text-muted mb-0"><span class="fw-bold">John Doe</span> joined the platform</p>
+                                <small class="text-muted" style="font-size:0.7rem">1 hour ago</small>
+                            </div>
+                        </div>
+                        <!-- Item 4 -->
+                        <div class="d-flex align-items-start">
+                            <div class="bg-danger bg-opacity-10 text-danger rounded-circle p-2 me-3" style="margin-top:2px;"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div>
+                                <h6 class="small fw-bold mb-0">Low Stock Alert</h6>
+                                <p class="small text-muted mb-0">Product "BMW Part 404" is running low</p>
+                                <small class="text-muted" style="font-size:0.7rem">2 hours ago</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <!-- PROFILE PAGE (Premium Style) -->
+      <div id="page-dashboard">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold" style="color: var(--text-main);">Overview</h3>
+            <button class="btn btn-sm btn-primary rounded-3"><i class="fas fa-download me-1"></i> Report</button>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="row g-4 mb-4">
+          <div class="col-md-3">
+            <div class="card-stats p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><h6 class="text-muted fw-light mb-1">Total Orders</h6><h2 class="fw-bold mb-0" id="stat-orders">0</h2></div>
+                    <div class="p-2 bg-primary bg-opacity-10 rounded-2 text-primary"><i class="fas fa-box"></i></div>
+                </div>
+                <small class="text-success mt-3 d-block"><i class="fas fa-arrow-up small"></i> 12% increase</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card-stats p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><h6 class="text-muted fw-light mb-1">Revenue</h6><h2 class="fw-bold text-success mb-0" id="stat-revenue">$0</h2></div>
+                    <div class="p-2 bg-success bg-opacity-10 rounded-2 text-success"><i class="fas fa-dollar-sign"></i></div>
+                </div>
+                <small class="text-success mt-3 d-block"><i class="fas fa-arrow-up small"></i> 5.2% increase</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card-stats p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><h6 class="text-muted fw-light mb-1">Appointments</h6><h2 class="fw-bold text-warning mb-0" id="stat-appointments">0</h2></div>
+                    <div class="p-2 bg-warning bg-opacity-10 rounded-2 text-warning"><i class="fas fa-calendar"></i></div>
+                </div>
+                <small class="text-muted mt-3 d-block">8 pending requests</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card-stats p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div><h6 class="text-muted fw-light mb-1">Users</h6><h2 class="fw-bold text-info mb-0" id="stat-users">0</h2></div>
+                    <div class="p-2 bg-info bg-opacity-10 rounded-2 text-info"><i class="fas fa-users"></i></div>
+                </div>
+                <small class="text-info mt-3 d-block">New users today</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts -->
         <div class="row g-4">
             <div class="col-md-8">
-                <div class="table-card h-100">
+                <div class="card-main p-4 h-100">
                     <h5 class="fw-bold mb-3">Revenue Analytics</h5>
-                    <canvas id="revenueChart"></canvas>
+                    <canvas id="revenueChart" style="height: 300px;"></canvas>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="table-card h-100">
+                <div class="card-main p-4 h-100">
                     <h5 class="fw-bold mb-3">Order Status</h5>
-                    <canvas id="statusChart"></canvas>
+                    <canvas id="statusChart" style="height: 250px;"></canvas>
                 </div>
             </div>
         </div>
       </div>
 
-      <!-- GENERIC TABLE PAGE (Reusable) -->
-      <div id="page-data" class="hidden">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold" id="page-title">Data</h3>
-            <button class="btn btn-sm btn-success" onclick="exportCSV()"><i class="fas fa-file-excel me-1"></i> Export CSV</button>
+      <!-- PROFILE PAGE (Premium Style) -->
+      <div id="page-profile" class="hidden">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card-main shadow overflow-hidden">
+                    <div class="profile-cover"></div>
+                    <div class="card-body text-center pb-4">
+                        <div class="profile-avatar mx-auto"><i class="fas fa-user"></i></div>
+                        <h3 class="fw-bold mt-3">Admin User</h3>
+                        <p class="text-muted">Super Administrator</p>
+                        
+                        <div class="row mt-4 g-3">
+                            <div class="col-md-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-body);">
+                                    <small class="text-muted d-block">Status</small>
+                                    <span class="badge bg-success rounded-pill px-3 py-1 mt-1">Active</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-body);">
+                                    <small class="text-muted d-block">Email</small>
+                                    <span class="fw-bold d-block mt-1 small">soni@gmail.com</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 rounded-3" style="background:var(--bg-body);">
+                                    <small class="text-muted d-block">Role</small>
+                                    <span class="fw-bold d-block mt-1 small">Full Access</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button class="btn btn-outline-primary rounded-3 px-4 me-2" data-bs-toggle="modal" data-bs-target="#settingsModal"><i class="fas fa-cog me-2"></i> Edit Settings</button>
+                            <button class="btn btn-outline-danger rounded-3 px-4" onclick="logout()"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="table-card">
-            <!-- Global Search -->
-            <div class="mb-3 position-relative">
-                <input type="text" id="searchInput" class="form-control" placeholder="Search data..." onkeyup="filterTable()">
-                <i class="fas fa-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
+      </div>
+
+      <!-- DATA PAGE -->
+      <div id="page-data" class="hidden">
+        <div class="card-main p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h3 class="fw-bold m-0" id="page-title">Data</h3>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-success rounded-2" onclick="exportCSV()"><i class="fas fa-file-excel me-1"></i> Export</button>
+                </div>
+            </div>
+            
+            <div class="position-relative mb-3">
+                <input type="text" id="searchInput" class="form-control ps-4 py-2 rounded-3 border-0" style="background:var(--bg-body);" placeholder="Search data..." onkeyup="filterTable()">
+                <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
             </div>
             
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
-                    <thead id="table-head">
-                        <!-- Dynamic Header -->
-                    </thead>
-                    <tbody id="table-body">
-                        <!-- Dynamic Body -->
-                    </tbody>
+                    <thead id="table-head"></thead>
+                    <tbody id="table-body"></tbody>
                 </table>
             </div>
         </div>
@@ -238,47 +563,85 @@
   </div>
 </div>
 
-<div id="page-profile" class="hidden">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card shadow-lg border-0 p-4 text-center">
-        <div class="bg-primary rounded-circle d-inline-flex justify-content-center align-items-center text-white mx-auto mb-3" style="width: 100px; height: 100px; font-size: 3rem;">
-          A
+<!-- SETTINGS MODAL -->
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg" style="background: var(--bg-card); color: var(--text-main);">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold">Edit Profile Settings</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Display Name</label>
+          <input type="text" id="editName" class="form-control" value="Admin User">
         </div>
-        <h3 class="fw-bold">Admin User</h3>
-        <p class="text-muted">soni@gmail.com</p>
-        <span class="badge bg-success rounded-pill px-3 py-2 mt-2">Super Admin</span>
-        
-        <hr class="my-4">
-        
-        <div class="row text-start small mb-4">
-          <div class="col-6 border-end">
-            <p class="text-muted mb-1">Status</p>
-            <span class="text-success fw-bold">Active</span>
-          </div>
-          <div class="col-6">
-            <p class="text-muted mb-1">Last Login</p>
-            <span>Just Now</span>
-          </div>
+        <div class="mb-3">
+          <label class="form-label small fw-bold">Email Address</label>
+          <input type="email" id="editEmail" class="form-control" value="soni@gmail.com">
         </div>
-
-        <button class="btn btn-outline-danger w-100" onclick="logout()">
-          <i class="fas fa-sign-out-alt me-2"></i> Logout
-        </button>
+        <div class="mb-3">
+          <label class="form-label small fw-bold">New Password (Optional)</label>
+          <input type="password" id="editPass" class="form-control" placeholder="Leave blank to keep current">
+        </div>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary rounded-3 px-4" onclick="saveSettings()"><i class="fas fa-save me-2"></i> Save Changes</button>
       </div>
     </div>
   </div>
 </div>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+  // LIVE CLOCK FUNCTION
+  function startClock() {
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('liveTime').innerText = now.toLocaleTimeString();
+        document.getElementById('liveDate').innerText = now.toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+    }, 1000);
+  }
+
+  // PDF GENERATOR FUNCTION
+  function generatePDF() {
+    const element = document.getElementById('page-dashboard');
+    const opt = {
+      margin:       0.5,
+      filename:     'Garix_Report_' + new Date().toISOString().slice(0,10) + '.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    
+    // Show alert
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    
+    html2pdf().set(opt).from(element).save().then(() => {
+        btn.innerHTML = originalText;
+    });
+  }
+  
+  // Start clock on load
+  startClock();
+
+</script>
+
 <script>
   // THEME TOGGLE
   function toggleTheme() {
     document.body.classList.toggle('dark-mode');
     const icon = document.querySelector('#theme-toggle i');
-    if(document.body.classList.contains('dark-mode')){
-        icon.classList.remove('fa-moon'); icon.classList.add('fa-sun');
-    } else {
-        icon.classList.remove('fa-sun'); icon.classList.add('fa-moon');
-    }
+    if(document.body.classList.contains('dark-mode')){ icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); } 
+    else { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); }
+  }
+
+  // MOBILE SIDEBAR TOGGLE
+  function toggleSidebar() {
+    document.getElementById('mainSidebar').classList.toggle('active');
+    document.querySelector('.sidebar-overlay').classList.toggle('active');
   }
 
   // LOGIN
@@ -287,7 +650,6 @@
     const formData = new FormData(); 
     formData.append('username', document.getElementById('username').value);
     formData.append('password', document.getElementById('password').value);
-    
     const res = await fetch('/admin/login', { method: 'POST', body: formData });
     const data = await res.json();
     if(data.status === 'success') {
@@ -299,48 +661,55 @@
     }
   });
 
-  // NAVIGATION & DATA LOADING
+  function logout() { if(confirm("Logout?")) location.reload(); }
+
+  // NAVIGATION
   let currentCollection = '';
-  
   function showPage(page) {
     if(page === 'dashboard') {
         document.getElementById('page-dashboard').classList.remove('hidden');
+        document.getElementById('page-profile').classList.add('hidden');
         document.getElementById('page-data').classList.add('hidden');
         loadStats();
+    } else if (page === 'profile') {
+        document.getElementById('page-dashboard').classList.add('hidden');
+        document.getElementById('page-profile').classList.remove('hidden');
+        document.getElementById('page-data').classList.add('hidden');
     } else {
         document.getElementById('page-dashboard').classList.add('hidden');
+        document.getElementById('page-profile').classList.add('hidden');
         document.getElementById('page-data').classList.remove('hidden');
-        
         currentCollection = page;
         document.getElementById('page-title').innerText = page.charAt(0).toUpperCase() + page.slice(1);
         loadData(page);
-        
-        // Update Sidebar Active State
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        event.target.closest('.nav-link').classList.add('active');
     }
+    
+    // Update active link
+    document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
+    if(event && event.target.closest('.nav-link')) event.target.closest('.nav-link').classList.add('active');
+
+    // Close sidebar on mobile after selection
+    if(window.innerWidth < 768) toggleSidebar();
   }
 
+  function showProfile() { showPage('profile'); }
+
+  // DATA & CHARTS
   async function loadStats() {
     const res = await fetch('/admin/stats');
     const d = await res.json();
-    
     document.getElementById('stat-orders').innerText = d.total_orders;
     document.getElementById('stat-revenue').innerText = '$'+d.total_revenue;
     document.getElementById('stat-appointments').innerText = d.total_appointments;
-    document.getElementById('stat-users').innerText = d.total_contacts; // Using contacts as user proxy
-
-    initCharts(d.total_orders, d.total_revenue); // Pass data to charts
+    document.getElementById('stat-users').innerText = d.total_contacts;
+    initCharts(d.total_orders, d.total_revenue);
   }
 
-  let chartInstances = {}; // Store chart instances to destroy/update them
-
+  let chartInstances = {};
   function initCharts(orders, revenue) {
-    // Destroy existing charts if any
     if(chartInstances.revenue) chartInstances.revenue.destroy();
     if(chartInstances.status) chartInstances.status.destroy();
 
-    // Revenue Chart
     const ctxRev = document.getElementById('revenueChart').getContext('2d');
     chartInstances.revenue = new Chart(ctxRev, {
         type: 'line',
@@ -349,16 +718,16 @@
             datasets: [{
                 label: 'Revenue ($)',
                 data: [1000, 1500, 2000, 1800, 2200, revenue || 2500],
-                borderColor: '#4e73df',
-                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
                 tension: 0.4,
-                fill: true
+                fill: true,
+                pointRadius: 4
             }]
         },
-        options: { responsive: true, plugins: { legend: { display: false } } }
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { display: false } }, x: { grid: { display: false } } } }
     });
 
-    // Status Chart (Simulated)
     const ctxStatus = document.getElementById('statusChart').getContext('2d');
     chartInstances.status = new Chart(ctxStatus, {
         type: 'doughnut',
@@ -366,10 +735,10 @@
             labels: ['Paid', 'Pending', 'Failed'],
             datasets: [{
                 data: [orders*0.7 || 10, orders*0.2 || 5, orders*0.1 || 2],
-                backgroundColor: ['#1cc88a', '#f6c23e', '#e74a3b']
+                backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
             }]
         },
-        options: { responsive: true, cutout: '70%' }
+        options: { responsive: true, cutout: '75%', plugins: { legend: { position: 'bottom' } } }
     });
   }
 
@@ -379,114 +748,128 @@
     const thead = document.getElementById('table-head');
     const tbody = document.getElementById('table-body');
     tbody.innerHTML = ''; thead.innerHTML = '';
+    if(data.length === 0) { tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4">No data found</td></tr>'; return; }
 
-    if(data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="text-center">No data found</td></tr>';
-        return;
-    }
-
-    // Generate Headers based on first item keys (Simplified)
     const headers = ['_id', 'date', 'name', 'email', 'total', 'status', 'payment_status'];
     const displayHeaders = ['ID', 'Date', 'Name', 'Email', 'Total', 'Status', 'Payment'];
-    
     let htmlHead = '<tr>';
-    displayHeaders.forEach(h => htmlHead += `<th class="small text-uppercase">${h}</th>`);
-    htmlHead += '<th>Actions</th></tr>';
-    thead.innerHTML = htmlHead;
+    displayHeaders.forEach(h => htmlHead += `<th>${h}</th>`);
+    htmlHead += '<th>Action</th></tr>'; thead.innerHTML = htmlHead;
 
-    // Generate Rows
     data.forEach(item => {
         let cols = '';
         headers.forEach(key => {
             let val = item[key];
-            // Nested object handling for customer name
             if(val === undefined && item.customer && item.customer.first_name) val = item.customer.first_name + ' ' + (item.customer.last_name||'');
             if(val === undefined) val = '-';
             if(key === '_id') val = val.substring(0,8) + '...';
-            
-            // Status Styling
             let style = '';
-            if((key === 'status' || key === 'payment_status') && val === 'paid') style = 'color: green; font-weight:600';
-            if((key === 'status' || key === 'payment_status') && val === 'pending') style = 'color: orange; font-weight:600';
-            
+            if((key === 'status' || key === 'payment_status') && val === 'paid') style = 'color: #10b981; font-weight:600';
+            if((key === 'status' || key === 'payment_status') && val === 'pending') style = 'color: #f59e0b; font-weight:600';
             cols += `<td style="${style}">${val}</td>`;
         });
-        
         const id = item._id;
-        const btn = `<button class="btn btn-sm btn-danger rounded-pill" onclick="deleteItem('${id}')"><i class="fas fa-trash"></i></button>`;
-        
+        const btn = `<button class="btn btn-sm btn-danger rounded-2" onclick="deleteItem('${id}')"><i class="fas fa-trash"></i></button>`;
         tbody.innerHTML += `<tr>${cols}<td>${btn}</td></tr>`;
     });
   }
 
-  // SEARCH FILTER
   function filterTable() {
-    const input = document.getElementById('searchInput');
-    const filter = input.value.toUpperCase();
-    const table = document.querySelector('.table');
-    const tr = table.getElementsByTagName('tr');
-
+    const input = document.getElementById('searchInput'); const filter = input.value.toUpperCase();
+    const table = document.querySelector('.table'); const tr = table.getElementsByTagName('tr');
     for (let i = 1; i < tr.length; i++) {
-        let tds = tr[i].getElementsByTagName('td');
-        let found = false;
-        for(let j=0; j<tds.length; j++){
-            if(tds[j] && tds[j].innerText.toUpperCase().indexOf(filter) > -1) {
-                found = true;
-                break;
-            }
-        }
+        let tds = tr[i].getElementsByTagName('td'); let found = false;
+        for(let j=0; j<tds.length; j++){ if(tds[j] && tds[j].innerText.toUpperCase().indexOf(filter) > -1) { found = true; break; } }
         tr[i].style.display = found ? "" : "none";
     }
   }
 
-  // CSV EXPORT
   function exportCSV() {
-    let csv = [];
-    const rows = document.querySelectorAll("table tr");
-    
+    let csv = []; const rows = document.querySelectorAll("table tr");
     for (let i = 0; i < rows.length; i++) {
         let row = [], cols = rows[i].querySelectorAll("td, th");
-        for (let j = 0; j < cols.length - 1; j++) { // Skip last col (Actions)
-            row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
-        }
+        for (let j = 0; j < cols.length - 1; j++) { row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"'); }
         csv.push(row.join(","));
     }
-
-    downloadCSV(csv.join("\n"), currentCollection + "_data.csv");
+    let csvFile = new Blob([csv.join("\n")], {type: "text/csv"}); let downloadLink = document.createElement("a");
+    downloadLink.download = currentCollection + ".csv"; downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none"; document.body.appendChild(downloadLink); downloadLink.click();
   }
 
-  function downloadCSV(csv, filename) {
-    let csvFile = new Blob([csv], {type: "text/csv"});
-    let downloadLink = document.createElement("a");
-    downloadLink.download = filename;
-    downloadLink.href = window.URL.createObjectURL(csvFile);
-    downloadLink.style.display = "none";
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+  
+  function saveSettings() {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    
+    // Loading effect
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
+    btn.disabled = true;
+
+    // Get values
+    const name = document.getElementById('editName').value;
+    const email = document.getElementById('editEmail').value;
+    
+    // Simulate API Call (Backend endpoint update karne ke liye /admin/update-profile ki zaroorat hogi)
+    setTimeout(() => {
+        // Update UI
+        document.querySelector('.profile-avatar').innerText = name.charAt(0).toUpperCase();
+        document.getElementById('page-profile').querySelector('h3').innerText = name;
+        document.getElementById('page-profile').querySelector('p').innerText = email;
+
+        // Hide Modal
+        var modalEl = document.getElementById('settingsModal');
+        var modalInstance = bootstrap.Modal.getInstance(modalEl);
+        modalInstance.hide();
+
+        // Reset Button
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        
+        alert("Profile updated successfully!");
+    }, 1000);
   }
 
-
-function showProfile() {
-    // Dashboard aur Data pages chupa do
-    document.getElementById('page-dashboard').classList.add('hidden');
-    document.getElementById('page-data').classList.add('hidden');
-    // Profile page dikhao
-    document.getElementById('page-profile').classList.remove('hidden');
-}
-
-  // DELETE
   async function deleteItem(id) {
-    if(!confirm("Delete this item permanently?")) return;
+    if(!confirm("Delete this item?")) return;
     const res = await fetch(`/admin/${currentCollection}/${id}`, { method: 'DELETE' });
     if(res.ok) loadData(currentCollection);
     else alert("Error deleting item.");
   }
 
-  function logout() { if(confirm("Logout?")) location.reload(); }
-</script>
+  // LIVE CLOCK FUNCTION
+  function startClock() {
+    setInterval(() => {
+        const now = new Date();
+        document.getElementById('liveTime').innerText = now.toLocaleTimeString();
+        document.getElementById('liveDate').innerText = now.toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+    }, 1000);
+  }
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  // PDF GENERATOR FUNCTION
+  function generatePDF() {
+    const element = document.getElementById('page-dashboard');
+    const opt = {
+      margin:       0.5,
+      filename:     'Garix_Report_' + new Date().toISOString().slice(0,10) + '.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    
+    // Show alert
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    
+    html2pdf().set(opt).from(element).save().then(() => {
+        btn.innerHTML = originalText;
+    });
+  }
+  
+  // Start clock on load
+  startClock();
+
+</script>
 </body>
 </html>
 
