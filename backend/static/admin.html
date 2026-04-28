@@ -126,9 +126,9 @@ setInterval(() => {
       --bg-card: #ffffff;
       --text-main: #1f2937;
       --text-muted: #6b7280;
-      --sidebar-bg: #111827;
-      --sidebar-active: #2563eb;
-      --accent: #2563eb;
+      --sidebar-bg: linear-gradient(160deg, #4A148C 0%, #6A0DAD 100%); /* Purple Gradient */
+      --sidebar-active: #ffffff;
+      --accent: #4A148C;
       --glass: rgba(255, 255, 255, 0.8);
       --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
@@ -152,9 +152,9 @@ setInterval(() => {
 
     /* PREMIUM SIDEBAR */
     .sidebar {
-      min-height: 100vh; 
-      background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
-      color: #d1d5db;
+      min-height: 100vh;
+      background: var(--sidebar-bg);
+      color: #fff;
       transition: all 0.3s ease;
       position: fixed; top: 0; left: 0; bottom: 0;
       width: 260px;
