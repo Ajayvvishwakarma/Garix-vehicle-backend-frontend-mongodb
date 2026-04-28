@@ -4,7 +4,7 @@
 
 <!-- Mirrored from html.vecurosoft.com/garix/demo/contact.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 22 Apr 2026 08:10:43 GMT -->
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8"> 
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <title>Garix - Vehicles Service & Solution HTML5 Template - Blog Grid </title>
   <meta name="author" content="vecuro">
@@ -15,7 +15,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <!-- Favicons - Place favicon.ico in the root directory -->
   <link rel="apple-touch-icon" sizes="57x57" href="assets/img/favicons/apple-icon-57x57.png">
-  <link rel="apple-touch-icon" sizes="60x60" href="assets/img/favicons/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="assets/img/favicons/apple-icon-60x60.png"> 
   <link rel="apple-touch-icon" sizes="72x72" href="assets/img/favicons/apple-icon-72x72.png">
   <link rel="apple-touch-icon" sizes="76x76" href="assets/img/favicons/apple-icon-76x76.png">
   <link rel="apple-touch-icon" sizes="114x114" href="assets/img/favicons/apple-icon-114x114.png">
@@ -114,15 +114,15 @@
             <a href="#none">Pages</a>
             <ul class="sub-menu">
               <li><a href="index.html">Home 1</a></li>
-              <li><a href="index-2.html">Home 2</a></li>
+              <li><a href="index-2.html">Home 2</a></li>              
               <li><a href="index-3.html">Home 3</a></li>
               <li><a href="about.html">About Us</a></li>
               <li><a href="price.html">Pricing Plans</a></li>
-              <li><a href="appointment.html">Appointment</a></li>
+              <li><a href="appointment.html">Appointment</a></li> 
               <li><a href="blog.html">Blog Grid</a></li>
               <li><a href="blog-sidebar.html">Blog Sidebar</a></li>
-              <li><a href="blog-sidebar-2.html">Blog Sidebar 2</a></li>
-              <li><a href="blog-details.html">Blog Details</a></li>
+              <li><a href="blog-sidebar-2.html">Blog Sidebar 2</a></li>  
+              <li><a href="blog-details.html">Blog Details</a></li> 
               <li><a href="services.html">Service</a></li>
               <li><a href="service-details.html">Service Details</a></li>
               <li><a href="faq.html">FAQs</a></li>
@@ -473,7 +473,7 @@
           </div>
         </div>
         <div class="col-lg-7 mb-30">
-          <form action="mail.php" method="post" class="form-style3 ajax-contact">
+          <form method="post" class="form-style3 ajax-contact" id="contactForm">
             <h3 class="sec-title">Send Us a Message</h3>
             <div class="row">
               <div class="col-md-6 form-group">
@@ -501,6 +501,47 @@
     </div>
   </section>
   <!-- Contact Area end -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var form = document.getElementById("contactForm");
+      if (form) {
+        form.addEventListener("submit", async function(e) {
+          e.preventDefault();
+          var btn = form.querySelector("button[type='submit']");
+          var orig = btn.innerHTML;
+          btn.innerHTML = "Sending...";
+          btn.disabled = true;
+          var fname = form.querySelector("[name='fname']")?.value.trim() || "";
+          var lname = form.querySelector("[name='lname']")?.value.trim() || "";
+          var email = form.querySelector("[name='email']")?.value.trim() || "";
+          var message = form.querySelector("[name='message']")?.value.trim() || "";
+          var fd = new FormData();
+          fd.append("fname", fname);
+          fd.append("lname", lname);
+          fd.append("email", email);
+          fd.append("message", message);
+          try {
+            var res = await fetch("/api/contact", {
+              method: "POST",
+              body: fd
+            });
+            var data = await res.json();
+            if (data.status === "success") {
+              alert("Message sent successfully!");
+              form.reset();
+            } else {
+              alert("Error: " + (data.message || "Unknown error"));
+            }
+          } catch (err) {
+            alert("Error connecting to backend: " + err.message);
+          } finally {
+            btn.innerHTML = orig;
+            btn.disabled = false;
+          }
+        });
+      }
+    });
+    </script>
   <!-- Map Area -->
   <div class="space-bottom">
     <div class="container">
