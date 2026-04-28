@@ -1,0 +1,493 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Garix Pro Admin</title>
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg-body: #f0f2f5;
+      --bg-card: #ffffff;
+      --text-main: #333333;
+      --text-muted: #6c757d;
+      --sidebar-bg: #2c3e50;
+      --sidebar-active: #34495e;
+      --accent: #4e73df;
+    }
+    
+    /* Dark Mode Variables */
+    body.dark-mode {
+      --bg-body: #1a1d21;
+      --bg-card: #262b2f;
+      --text-main: #e0e0e0;
+      --text-muted: #a0a0a0;
+      --sidebar-bg: #121417;
+      --sidebar-active: #1f2329;
+    }
+
+    body { 
+      background-color: var(--bg-body); 
+      color: var(--text-main); 
+      font-family: 'Poppins', sans-serif; 
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .sidebar {
+      min-height: 100vh; background-color: var(--sidebar-bg); color: white;
+      transition: background 0.3s;
+    }
+    
+    .sidebar .nav-link { 
+      color: #adb5bd; margin-bottom: 5px; border-radius: 5px; padding: 12px 15px;
+      transition: all 0.2s;
+    }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active { 
+      background-color: var(--accent); color: white; box-shadow: 0 4px 6px rgba(78,115,223,0.4);
+    }
+
+    .stats-card { 
+      border: none; border-radius: 15px; 
+      background-color: var(--bg-card);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+      color: var(--text-main);
+      transition: transform 0.2s, background 0.3s;
+    }
+    .stats-card:hover { transform: translateY(-5px); }
+
+    .main-content { min-height: 100vh; padding-top: 80px; } /* Space for navbar */
+    
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    body.dark-mode .glass-nav { background: rgba(38, 43, 47, 0.9); border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+    .login-card { 
+      width: 100%; max-width: 400px; padding: 2.5rem; 
+      border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+      background: var(--bg-card); color: var(--text-main);
+    }
+
+    .table-card {
+      background: var(--bg-card);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      color: var(--text-main);
+    }
+
+    .table thead th {
+      background-color: var(--sidebar-bg);
+      color: white;
+      border: none;
+    }
+    .table td { color: var(--text-main); border-color: rgba(0,0,0,0.1); }
+    
+    .hidden { display: none !important; }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6c757d; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-section" style="min-height:100vh; display:flex; align-items:center; justify-content:center; background: var(--bg-body);">
+  <div class="login-card text-center">
+    <h3 class="fw-bold mb-4" style="color: var(--accent);">Garix Admin</h3>
+    <form id="login-form">
+      <div class="mb-3 text-start"><label class="form-label small">Email</label><input type="text" id="username" class="form-control border-0 bg-light" placeholder="soni@gmail.com" required></div>
+      <div class="mb-3 text-start"><label class="form-label small">Password</label><input type="password" id="password" class="form-control border-0 bg-light" placeholder="12345678" required></div>
+      <button type="submit" class="btn btn-primary w-100 fw-bold" style="background: var(--accent); border:none; padding:10px;">LOGIN</button>
+      <p id="login-error" class="text-danger mt-3 small mb-0"></p>
+    </form>
+  </div>
+</div>
+
+<!-- MAIN DASHBOARD -->
+<div id="dashboard-section" class="container-fluid hidden" style="padding-left: 0; padding-right: 0;">
+  
+  <!-- TOP NAVBAR -->
+  <nav class="navbar navbar-expand-lg fixed-top glass-nav px-4">
+    <a class="navbar-brand fw-bold" href="#" style="color: var(--accent);">GARIX <span class="badge bg-dark rounded-pill small">PRO</span></a>
+    
+    <div class="d-flex align-items-center gap-3">
+        <!-- Dark Mode Toggle -->
+        <button class="btn btn-sm btn-outline-dark" id="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+        
+        <!-- Profile -->
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                <div class="bg-primary rounded-circle d-flex justify-content-center align-items-center text-white" style="width:35px; height:35px;">A</div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#" onclick="showProfile()">Profile</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+  </nav>
+
+  <div class="row g-0">
+    <!-- SIDEBAR -->
+    <div class="col-md-2 sidebar d-none d-md-block pt-5">
+      <ul class="nav flex-column px-2">
+        <li class="nav-item"><a href="#" class="nav-link active" onclick="showPage('dashboard')"><i class="fas fa-chart-line me-2"></i> Dashboard</a></li>
+        <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('orders')"><i class="fas fa-shopping-bag me-2"></i> Orders</a></li>
+        <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('appointments')"><i class="fas fa-calendar-check me-2"></i> Appointments</a></li>
+        <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('contacts')"><i class="fas fa-envelope-open-text me-2"></i> Contacts</a></li>
+        <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('cart')"><i class="fas fa-shopping-cart me-2"></i> Cart</a></li>
+        <li class="nav-item"><a href="#" class="nav-link" onclick="showPage('wishlist')"><i class="fas fa-heart me-2"></i> Wishlist</a></li>
+      </ul>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="col-md-10 main-content p-4">
+      
+      <!-- DASHBOARD PAGE -->
+      <div id="page-dashboard">
+        <h3 class="fw-bold mb-4">Overview</h3>
+        
+        <!-- Stats Row -->
+        <div class="row g-4 mb-4">
+          <div class="col-md-3">
+            <div class="card stats-card p-3 h-100">
+                <div class="d-flex justify-content-between"><div><h6 class="text-muted">Total Orders</h6><h3 class="fw-bold" id="stat-orders">0</h3></div><i class="fas fa-box fa-2x text-primary opacity-25"></i></div>
+                <small class="text-success"><i class="fas fa-arrow-up"></i> +12% this week</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card stats-card p-3 h-100">
+                <div class="d-flex justify-content-between"><div><h6 class="text-muted">Revenue</h6><h3 class="fw-bold text-success" id="stat-revenue">$0</h3></div><i class="fas fa-coins fa-2x text-success opacity-25"></i></div>
+                <small class="text-success"><i class="fas fa-arrow-up"></i> +5% this month</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card stats-card p-3 h-100">
+                <div class="d-flex justify-content-between"><div><h6 class="text-muted">Appointments</h6><h3 class="fw-bold text-warning" id="stat-appointments">0</h3></div><i class="fas fa-calendar-alt fa-2x text-warning opacity-25"></i></div>
+                <small class="text-muted">Pending actions</small>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card stats-card p-3 h-100">
+                <div class="d-flex justify-content-between"><div><h6 class="text-muted">Users</h6><h3 class="fw-bold text-info" id="stat-users">0</h3></div><i class="fas fa-users fa-2x text-info opacity-25"></i></div>
+                <small class="text-info">Active now</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row g-4">
+            <div class="col-md-8">
+                <div class="table-card h-100">
+                    <h5 class="fw-bold mb-3">Revenue Analytics</h5>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="table-card h-100">
+                    <h5 class="fw-bold mb-3">Order Status</h5>
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <!-- GENERIC TABLE PAGE (Reusable) -->
+      <div id="page-data" class="hidden">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold" id="page-title">Data</h3>
+            <button class="btn btn-sm btn-success" onclick="exportCSV()"><i class="fas fa-file-excel me-1"></i> Export CSV</button>
+        </div>
+        
+        <div class="table-card">
+            <!-- Global Search -->
+            <div class="mb-3 position-relative">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search data..." onkeyup="filterTable()">
+                <i class="fas fa-search position-absolute top-50 end-0 translate-middle-y me-3 text-muted"></i>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead id="table-head">
+                        <!-- Dynamic Header -->
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Dynamic Body -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="page-profile" class="hidden">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow-lg border-0 p-4 text-center">
+        <div class="bg-primary rounded-circle d-inline-flex justify-content-center align-items-center text-white mx-auto mb-3" style="width: 100px; height: 100px; font-size: 3rem;">
+          A
+        </div>
+        <h3 class="fw-bold">Admin User</h3>
+        <p class="text-muted">soni@gmail.com</p>
+        <span class="badge bg-success rounded-pill px-3 py-2 mt-2">Super Admin</span>
+        
+        <hr class="my-4">
+        
+        <div class="row text-start small mb-4">
+          <div class="col-6 border-end">
+            <p class="text-muted mb-1">Status</p>
+            <span class="text-success fw-bold">Active</span>
+          </div>
+          <div class="col-6">
+            <p class="text-muted mb-1">Last Login</p>
+            <span>Just Now</span>
+          </div>
+        </div>
+
+        <button class="btn btn-outline-danger w-100" onclick="logout()">
+          <i class="fas fa-sign-out-alt me-2"></i> Logout
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  // THEME TOGGLE
+  function toggleTheme() {
+    document.body.classList.toggle('dark-mode');
+    const icon = document.querySelector('#theme-toggle i');
+    if(document.body.classList.contains('dark-mode')){
+        icon.classList.remove('fa-moon'); icon.classList.add('fa-sun');
+    } else {
+        icon.classList.remove('fa-sun'); icon.classList.add('fa-moon');
+    }
+  }
+
+  // LOGIN
+  document.getElementById('login-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(); 
+    formData.append('username', document.getElementById('username').value);
+    formData.append('password', document.getElementById('password').value);
+    
+    const res = await fetch('/admin/login', { method: 'POST', body: formData });
+    const data = await res.json();
+    if(data.status === 'success') {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('dashboard-section').classList.remove('hidden');
+        loadStats();
+    } else {
+        document.getElementById('login-error').textContent = data.message;
+    }
+  });
+
+  // NAVIGATION & DATA LOADING
+  let currentCollection = '';
+  
+  function showPage(page) {
+    if(page === 'dashboard') {
+        document.getElementById('page-dashboard').classList.remove('hidden');
+        document.getElementById('page-data').classList.add('hidden');
+        loadStats();
+    } else {
+        document.getElementById('page-dashboard').classList.add('hidden');
+        document.getElementById('page-data').classList.remove('hidden');
+        
+        currentCollection = page;
+        document.getElementById('page-title').innerText = page.charAt(0).toUpperCase() + page.slice(1);
+        loadData(page);
+        
+        // Update Sidebar Active State
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        event.target.closest('.nav-link').classList.add('active');
+    }
+  }
+
+  async function loadStats() {
+    const res = await fetch('/admin/stats');
+    const d = await res.json();
+    
+    document.getElementById('stat-orders').innerText = d.total_orders;
+    document.getElementById('stat-revenue').innerText = '$'+d.total_revenue;
+    document.getElementById('stat-appointments').innerText = d.total_appointments;
+    document.getElementById('stat-users').innerText = d.total_contacts; // Using contacts as user proxy
+
+    initCharts(d.total_orders, d.total_revenue); // Pass data to charts
+  }
+
+  let chartInstances = {}; // Store chart instances to destroy/update them
+
+  function initCharts(orders, revenue) {
+    // Destroy existing charts if any
+    if(chartInstances.revenue) chartInstances.revenue.destroy();
+    if(chartInstances.status) chartInstances.status.destroy();
+
+    // Revenue Chart
+    const ctxRev = document.getElementById('revenueChart').getContext('2d');
+    chartInstances.revenue = new Chart(ctxRev, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Revenue ($)',
+                data: [1000, 1500, 2000, 1800, 2200, revenue || 2500],
+                borderColor: '#4e73df',
+                backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+
+    // Status Chart (Simulated)
+    const ctxStatus = document.getElementById('statusChart').getContext('2d');
+    chartInstances.status = new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+            labels: ['Paid', 'Pending', 'Failed'],
+            datasets: [{
+                data: [orders*0.7 || 10, orders*0.2 || 5, orders*0.1 || 2],
+                backgroundColor: ['#1cc88a', '#f6c23e', '#e74a3b']
+            }]
+        },
+        options: { responsive: true, cutout: '70%' }
+    });
+  }
+
+  async function loadData(collection) {
+    const res = await fetch('/admin/' + collection);
+    const data = await res.json();
+    const thead = document.getElementById('table-head');
+    const tbody = document.getElementById('table-body');
+    tbody.innerHTML = ''; thead.innerHTML = '';
+
+    if(data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center">No data found</td></tr>';
+        return;
+    }
+
+    // Generate Headers based on first item keys (Simplified)
+    const headers = ['_id', 'date', 'name', 'email', 'total', 'status', 'payment_status'];
+    const displayHeaders = ['ID', 'Date', 'Name', 'Email', 'Total', 'Status', 'Payment'];
+    
+    let htmlHead = '<tr>';
+    displayHeaders.forEach(h => htmlHead += `<th class="small text-uppercase">${h}</th>`);
+    htmlHead += '<th>Actions</th></tr>';
+    thead.innerHTML = htmlHead;
+
+    // Generate Rows
+    data.forEach(item => {
+        let cols = '';
+        headers.forEach(key => {
+            let val = item[key];
+            // Nested object handling for customer name
+            if(val === undefined && item.customer && item.customer.first_name) val = item.customer.first_name + ' ' + (item.customer.last_name||'');
+            if(val === undefined) val = '-';
+            if(key === '_id') val = val.substring(0,8) + '...';
+            
+            // Status Styling
+            let style = '';
+            if((key === 'status' || key === 'payment_status') && val === 'paid') style = 'color: green; font-weight:600';
+            if((key === 'status' || key === 'payment_status') && val === 'pending') style = 'color: orange; font-weight:600';
+            
+            cols += `<td style="${style}">${val}</td>`;
+        });
+        
+        const id = item._id;
+        const btn = `<button class="btn btn-sm btn-danger rounded-pill" onclick="deleteItem('${id}')"><i class="fas fa-trash"></i></button>`;
+        
+        tbody.innerHTML += `<tr>${cols}<td>${btn}</td></tr>`;
+    });
+  }
+
+  // SEARCH FILTER
+  function filterTable() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toUpperCase();
+    const table = document.querySelector('.table');
+    const tr = table.getElementsByTagName('tr');
+
+    for (let i = 1; i < tr.length; i++) {
+        let tds = tr[i].getElementsByTagName('td');
+        let found = false;
+        for(let j=0; j<tds.length; j++){
+            if(tds[j] && tds[j].innerText.toUpperCase().indexOf(filter) > -1) {
+                found = true;
+                break;
+            }
+        }
+        tr[i].style.display = found ? "" : "none";
+    }
+  }
+
+  // CSV EXPORT
+  function exportCSV() {
+    let csv = [];
+    const rows = document.querySelectorAll("table tr");
+    
+    for (let i = 0; i < rows.length; i++) {
+        let row = [], cols = rows[i].querySelectorAll("td, th");
+        for (let j = 0; j < cols.length - 1; j++) { // Skip last col (Actions)
+            row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+        }
+        csv.push(row.join(","));
+    }
+
+    downloadCSV(csv.join("\n"), currentCollection + "_data.csv");
+  }
+
+  function downloadCSV(csv, filename) {
+    let csvFile = new Blob([csv], {type: "text/csv"});
+    let downloadLink = document.createElement("a");
+    downloadLink.download = filename;
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  }
+
+
+function showProfile() {
+    // Dashboard aur Data pages chupa do
+    document.getElementById('page-dashboard').classList.add('hidden');
+    document.getElementById('page-data').classList.add('hidden');
+    // Profile page dikhao
+    document.getElementById('page-profile').classList.remove('hidden');
+}
+
+  // DELETE
+  async function deleteItem(id) {
+    if(!confirm("Delete this item permanently?")) return;
+    const res = await fetch(`/admin/${currentCollection}/${id}`, { method: 'DELETE' });
+    if(res.ok) loadData(currentCollection);
+    else alert("Error deleting item.");
+  }
+
+  function logout() { if(confirm("Logout?")) location.reload(); }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
